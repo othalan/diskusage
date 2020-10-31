@@ -1,40 +1,18 @@
 package com.google.android.diskusage.datasource;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-
 public interface StatFsSource {
 
-  @Deprecated
-  int getAvailableBlocks();
+  long getAvailableBlocks();
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getAvailableBlocksLong();
+  long getAvailableBytes();
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getAvailableBytes();
+  long getBlockCount();
 
-  @Deprecated
-  public int getBlockCount();
+  long getBlockSize();
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getBlockCountLong();
+  long getFreeBytes();
 
-  @Deprecated
-  public int getBlockSize();
+  long getFreeBlocks();
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getBlockSizeLong();
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getFreeBytes();
-
-  @Deprecated
-  public int getFreeBlocks();
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getFreeBlocksLong();
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  public long getTotalBytes();
+  long getTotalBytes();
 }

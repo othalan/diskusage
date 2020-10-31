@@ -1,12 +1,5 @@
 package com.google.android.diskusage.datasource.fast;
 
-import com.google.android.diskusage.datasource.AppStatsCallback;
-import com.google.android.diskusage.datasource.DataSource;
-import com.google.android.diskusage.datasource.LegacyFile;
-import com.google.android.diskusage.datasource.PkgInfo;
-import com.google.android.diskusage.datasource.PortableFile;
-import com.google.android.diskusage.datasource.StatFsSource;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.IPackageStatsObserver;
@@ -15,6 +8,13 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageStats;
 import android.os.Build;
 import android.os.Environment;
+
+import com.google.android.diskusage.datasource.AppStatsCallback;
+import com.google.android.diskusage.datasource.DataSource;
+import com.google.android.diskusage.datasource.LegacyFile;
+import com.google.android.diskusage.datasource.PkgInfo;
+import com.google.android.diskusage.datasource.PortableFile;
+import com.google.android.diskusage.datasource.StatFsSource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,14 +33,14 @@ public class DefaultDataSource extends DataSource {
 
   @Override
   public int getAndroidVersion() {
-    return Integer.parseInt(Build.VERSION.SDK);
+    return Build.VERSION.SDK_INT;
   }
 
   @Override
   public List<PkgInfo> getInstalledPackages(PackageManager pm) {
     final List<PackageInfo> installedPackages = pm.getInstalledPackages(
-        PackageManager.GET_META_DATA | PackageManager.GET_UNINSTALLED_PACKAGES);
-    List<PkgInfo> packageInfos = new ArrayList<PkgInfo>();
+        PackageManager.GET_META_DATA | PackageManager.MATCH_UNINSTALLED_PACKAGES);
+    List<PkgInfo> packageInfos = new ArrayList<>();
     for (PackageInfo info : installedPackages) {
       packageInfos.add(new PkgInfoImpl(info, pm));
     }

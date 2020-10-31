@@ -93,16 +93,14 @@ public final class Dump extends
       output.writeMessage(4, this.proc);
     }
     if (this.appInfo != null && this.appInfo.length > 0) {
-      for (int i = 0; i < this.appInfo.length; i++) {
-        com.google.android.diskusage.proto.AppInfoProto element = this.appInfo[i];
+      for (AppInfoProto element : this.appInfo) {
         if (element != null) {
           output.writeMessage(5, element);
         }
       }
     }
     if (this.statFs != null && this.statFs.length > 0) {
-      for (int i = 0; i < this.statFs.length; i++) {
-        com.google.android.diskusage.proto.StatFsProto element = this.statFs[i];
+      for (StatFsProto element : this.statFs) {
         if (element != null) {
           output.writeMessage(6, element);
         }
@@ -112,8 +110,7 @@ public final class Dump extends
       output.writeMessage(8, this.externalFilesDir);
     }
     if (this.externalFilesDirs != null && this.externalFilesDirs.length > 0) {
-      for (int i = 0; i < this.externalFilesDirs.length; i++) {
-        com.google.android.diskusage.proto.PortableFileProto element = this.externalFilesDirs[i];
+      for (PortableFileProto element : this.externalFilesDirs) {
         if (element != null) {
           output.writeMessage(9, element);
         }
@@ -122,12 +119,11 @@ public final class Dump extends
     if (this.externalStorageDirectory != null) {
       output.writeMessage(10, this.externalStorageDirectory);
     }
-    if (this.isDeviceRooted != false) {
-      output.writeBool(11, this.isDeviceRooted);
+    if (this.isDeviceRooted) {
+      output.writeBool(11, true);
     }
     if (this.nativeScan != null && this.nativeScan.length > 0) {
-      for (int i = 0; i < this.nativeScan.length; i++) {
-        com.google.android.diskusage.proto.NativeScanProto element = this.nativeScan[i];
+      for (NativeScanProto element : this.nativeScan) {
         if (element != null) {
           output.writeMessage(12, element);
         }
@@ -159,20 +155,18 @@ public final class Dump extends
         .computeMessageSize(4, this.proc);
     }
     if (this.appInfo != null && this.appInfo.length > 0) {
-      for (int i = 0; i < this.appInfo.length; i++) {
-        com.google.android.diskusage.proto.AppInfoProto element = this.appInfo[i];
+      for (AppInfoProto element : this.appInfo) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-            .computeMessageSize(5, element);
+                  .computeMessageSize(5, element);
         }
       }
     }
     if (this.statFs != null && this.statFs.length > 0) {
-      for (int i = 0; i < this.statFs.length; i++) {
-        com.google.android.diskusage.proto.StatFsProto element = this.statFs[i];
+      for (StatFsProto element : this.statFs) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-            .computeMessageSize(6, element);
+                  .computeMessageSize(6, element);
         }
       }
     }
@@ -181,11 +175,10 @@ public final class Dump extends
         .computeMessageSize(8, this.externalFilesDir);
     }
     if (this.externalFilesDirs != null && this.externalFilesDirs.length > 0) {
-      for (int i = 0; i < this.externalFilesDirs.length; i++) {
-        com.google.android.diskusage.proto.PortableFileProto element = this.externalFilesDirs[i];
+      for (PortableFileProto element : this.externalFilesDirs) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-            .computeMessageSize(9, element);
+                  .computeMessageSize(9, element);
         }
       }
     }
@@ -193,16 +186,15 @@ public final class Dump extends
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
         .computeMessageSize(10, this.externalStorageDirectory);
     }
-    if (this.isDeviceRooted != false) {
+    if (this.isDeviceRooted) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(11, this.isDeviceRooted);
+          .computeBoolSize(11, true);
     }
     if (this.nativeScan != null && this.nativeScan.length > 0) {
-      for (int i = 0; i < this.nativeScan.length; i++) {
-        com.google.android.diskusage.proto.NativeScanProto element = this.nativeScan[i];
+      for (NativeScanProto element : this.nativeScan) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-            .computeMessageSize(12, element);
+                  .computeMessageSize(12, element);
         }
       }
     }

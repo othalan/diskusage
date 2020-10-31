@@ -81,8 +81,8 @@ public final class AppInfoProto extends
     if (!this.dataDir.equals("")) {
       output.writeString(3, this.dataDir);
     }
-    if (this.isEnable != false) {
-      output.writeBool(4, this.isEnable);
+    if (this.isEnable) {
+      output.writeBool(4, true);
     }
     if (!this.name.equals("")) {
       output.writeString(5, this.name);
@@ -94,8 +94,7 @@ public final class AppInfoProto extends
       output.writeString(7, this.sourceDir);
     }
     if (this.splitSourceDirs != null && this.splitSourceDirs.length > 0) {
-      for (int i = 0; i < this.splitSourceDirs.length; i++) {
-        java.lang.String element = this.splitSourceDirs[i];
+      for (String element : this.splitSourceDirs) {
         if (element != null) {
           output.writeString(8, element);
         }
@@ -125,9 +124,9 @@ public final class AppInfoProto extends
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
           .computeStringSize(3, this.dataDir);
     }
-    if (this.isEnable != false) {
+    if (this.isEnable) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(4, this.isEnable);
+          .computeBoolSize(4, true);
     }
     if (!this.name.equals("")) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
@@ -144,16 +143,15 @@ public final class AppInfoProto extends
     if (this.splitSourceDirs != null && this.splitSourceDirs.length > 0) {
       int dataCount = 0;
       int dataSize = 0;
-      for (int i = 0; i < this.splitSourceDirs.length; i++) {
-        java.lang.String element = this.splitSourceDirs[i];
+      for (String element : this.splitSourceDirs) {
         if (element != null) {
           dataCount++;
           dataSize += com.google.protobuf.nano.CodedOutputByteBufferNano
-              .computeStringSizeNoTag(element);
+                  .computeStringSizeNoTag(element);
         }
       }
       size += dataSize;
-      size += 1 * dataCount;
+      size += dataCount;
     }
     if (!this.applicationLabel.equals("")) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano

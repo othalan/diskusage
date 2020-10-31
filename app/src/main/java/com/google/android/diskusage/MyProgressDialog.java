@@ -19,9 +19,6 @@
 
 package com.google.android.diskusage;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Paint;
@@ -29,13 +26,15 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.diskusage.entity.FileSystemEntry;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 public class MyProgressDialog extends AlertDialog {
   private final Context context;
@@ -59,8 +58,8 @@ public class MyProgressDialog extends AlertDialog {
   private int depth = 0;
   private boolean warned = false;
 
-  private final String path(FileSystemEntry entry) {
-    ArrayList<String> pathElements = new ArrayList<String>();
+  private String path(FileSystemEntry entry) {
+    ArrayList<String> pathElements = new ArrayList<>();
     FileSystemEntry current = entry;
     while (current != null) {
       pathElements.add(current.name);

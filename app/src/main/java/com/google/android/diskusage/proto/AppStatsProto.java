@@ -84,20 +84,20 @@ public final class AppStatsProto extends
   @Override
   public void writeTo(com.google.protobuf.nano.CodedOutputByteBufferNano output)
       throws java.io.IOException {
-    if (this.callbackReceived != false) {
-      output.writeBool(1, this.callbackReceived);
+    if (this.callbackReceived) {
+      output.writeBool(1, true);
     }
-    if (this.callbackParseDone != false) {
-      output.writeBool(2, this.callbackParseDone);
+    if (this.callbackParseDone) {
+      output.writeBool(2, true);
     }
-    if (this.callbackChildFinished != false) {
-      output.writeBool(3, this.callbackChildFinished);
+    if (this.callbackChildFinished) {
+      output.writeBool(3, true);
     }
-    if (this.succeeded != false) {
-      output.writeBool(4, this.succeeded);
+    if (this.succeeded) {
+      output.writeBool(4, true);
     }
-    if (this.hasAppStats != false) {
-      output.writeBool(5, this.hasAppStats);
+    if (this.hasAppStats) {
+      output.writeBool(5, true);
     }
     if (this.cacheSize != 0L) {
       output.writeInt64(6, this.cacheSize);
@@ -129,25 +129,25 @@ public final class AppStatsProto extends
   @Override
   protected int computeSerializedSize() {
     int size = super.computeSerializedSize();
-    if (this.callbackReceived != false) {
+    if (this.callbackReceived) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(1, this.callbackReceived);
+          .computeBoolSize(1, true);
     }
-    if (this.callbackParseDone != false) {
+    if (this.callbackParseDone) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(2, this.callbackParseDone);
+          .computeBoolSize(2, true);
     }
-    if (this.callbackChildFinished != false) {
+    if (this.callbackChildFinished) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(3, this.callbackChildFinished);
+          .computeBoolSize(3, true);
     }
-    if (this.succeeded != false) {
+    if (this.succeeded) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(4, this.succeeded);
+          .computeBoolSize(4, true);
     }
-    if (this.hasAppStats != false) {
+    if (this.hasAppStats) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(5, this.hasAppStats);
+          .computeBoolSize(5, true);
     }
     if (this.cacheSize != 0L) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano

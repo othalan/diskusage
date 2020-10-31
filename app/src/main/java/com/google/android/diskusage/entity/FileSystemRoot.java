@@ -1,7 +1,5 @@
 package com.google.android.diskusage.entity;
 
-import com.google.android.diskusage.MountPoint;
-
 public class FileSystemRoot extends FileSystemEntry {
   final String rootPath;
   private final boolean deletable;
@@ -22,7 +20,7 @@ public class FileSystemRoot extends FileSystemEntry {
   }
 
   @Override
-  public FileSystemEntry filter(CharSequence pattern, int blockSize) {
+  public FileSystemEntry filter(CharSequence pattern, long blockSize) {
     // don't match name
     return filterChildren(pattern, blockSize);
   }
@@ -45,7 +43,7 @@ public class FileSystemRoot extends FileSystemEntry {
       return getEntryByName(path, true);
     }
     if (pathWithSlash.startsWith(rootPathWithSlash)) {
-      return getEntryByName(path.substring(rootPathWithSlash.length(), path.length()), true);
+      return getEntryByName(path.substring(rootPathWithSlash.length()), true);
     }
     for (FileSystemEntry s : children) {
       if (s instanceof FileSystemRoot) {

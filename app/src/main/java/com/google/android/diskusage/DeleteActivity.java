@@ -22,8 +22,6 @@ package com.google.android.diskusage;
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,18 +61,14 @@ public class DeleteActivity extends Activity {
         count,
         summary));
     Button ok = (Button) findViewById(R.id.ok_button);
-    ok.setOnClickListener(new OnClickListener() {
-      public void onClick(View arg0) {
-        setResult(DiskUsage.RESULT_DELETE_CONFIRMED, responseIntent);
-        finish();
-      }
+    ok.setOnClickListener(arg0 -> {
+      setResult(DiskUsage.RESULT_DELETE_CONFIRMED, responseIntent);
+      finish();
     });
     Button cancel = (Button) findViewById(R.id.cancel_button);
-    cancel.setOnClickListener(new OnClickListener() {
-      public void onClick(View arg0) {
-        setResult(DiskUsage.RESULT_DELETE_CANCELED);
-        finish();
-      }
+    cancel.setOnClickListener(arg0 -> {
+      setResult(DiskUsage.RESULT_DELETE_CANCELED);
+      finish();
     });
   }
   

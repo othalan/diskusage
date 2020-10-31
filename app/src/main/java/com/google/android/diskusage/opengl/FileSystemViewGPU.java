@@ -15,7 +15,7 @@ import com.google.android.diskusage.FileSystemState.MyMotionEvent;
 public final class FileSystemViewGPU extends SurfaceView
                                      implements FileSystemView, SurfaceHolder.Callback {
   FileSystemState eventHandler;
-  private AbstractRenderingThread thread;
+  private final AbstractRenderingThread thread;
 
   
   public FileSystemViewGPU(DiskUsage context, FileSystemState eventHandler) {
@@ -39,8 +39,7 @@ public final class FileSystemViewGPU extends SurfaceView
   public final boolean onTouchEvent(final MotionEvent ev) {
     final MyMotionEvent myev = 
       eventHandler.multitouchHandler.newMyMotionEvent(ev);
-;
-    thread.addEvent(new Runnable() {
+      thread.addEvent(new Runnable() {
       @Override
       public void run() {
         eventHandler.onTouchEvent(myev);
@@ -83,9 +82,9 @@ public final class FileSystemViewGPU extends SurfaceView
       case KeyEvent.KEYCODE_DPAD_DOWN:
       case KeyEvent.KEYCODE_SEARCH:
         return true;
-    };
+    }
 
-    return super.onKeyDown(keyCode, event);
+      return super.onKeyDown(keyCode, event);
   }
   
   @Override

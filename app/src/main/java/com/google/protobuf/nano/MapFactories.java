@@ -37,7 +37,7 @@ import java.util.Map;
  * Utility class for maps support.
  */
 public final class MapFactories {
-  public static interface MapFactory {
+  public interface MapFactory {
     <K, V> Map<K, V> forMap(Map<K, V> oldMap);
   }
 

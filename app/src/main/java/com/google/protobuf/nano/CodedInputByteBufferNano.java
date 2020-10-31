@@ -395,7 +395,7 @@ public final class CodedInputByteBufferNano {
   // -----------------------------------------------------------------
 
   private final byte[] buffer;
-  private int bufferStart;
+  private final int bufferStart;
   private int bufferSize;
   private int bufferSizeAfterLimit;
   private int bufferPos;

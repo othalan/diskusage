@@ -1,9 +1,9 @@
 package com.google.android.diskusage.datasource.fast;
 
+import com.google.android.diskusage.datasource.LegacyFile;
+
 import java.io.File;
 import java.io.IOException;
-
-import com.google.android.diskusage.datasource.LegacyFile;
 
 public class LegacyFileImpl implements LegacyFile {
 
@@ -31,7 +31,7 @@ public class LegacyFileImpl implements LegacyFile {
   public boolean isLink() {
     try {
       if (file.getCanonicalPath().equals(file.getPath())) return false;
-    } catch(Throwable t) {}
+    } catch(Throwable ignored) {}
     return true;
   }
 

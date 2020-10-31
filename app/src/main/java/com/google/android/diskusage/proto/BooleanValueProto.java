@@ -40,8 +40,8 @@ public final class BooleanValueProto extends
   @Override
   public void writeTo(com.google.protobuf.nano.CodedOutputByteBufferNano output)
       throws java.io.IOException {
-    if (this.value != false) {
-      output.writeBool(1, this.value);
+    if (this.value) {
+      output.writeBool(1, true);
     }
     if (this.exception != null) {
       output.writeMessage(2, this.exception);
@@ -52,9 +52,9 @@ public final class BooleanValueProto extends
   @Override
   protected int computeSerializedSize() {
     int size = super.computeSerializedSize();
-    if (this.value != false) {
+    if (this.value) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(1, this.value);
+          .computeBoolSize(1, true);
     }
     if (this.exception != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano

@@ -28,9 +28,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.storage.StorageManager;
-import android.system.Os;
-import android.system.StructStat;
-import android.system.StructStatVfs;
 import android.util.Log;
 
 import com.google.android.diskusage.entity.FileSystemEntry;
@@ -54,7 +51,7 @@ public class Apps2SDLoader {
   }
 
 
-  public FileSystemEntry[] load(final int blockSize) throws Throwable {
+  public FileSystemEntry[] load(final long blockSize) throws Throwable {
     UsageStatsManager usageStatsManager = (UsageStatsManager) diskUsage.getSystemService(Context.USAGE_STATS_SERVICE);
 
 
@@ -62,7 +59,7 @@ public class Apps2SDLoader {
             UsageStatsManager.INTERVAL_YEARLY, 0 ,System.currentTimeMillis());
     Log.d("diskusage", "stats size = " + queryUsageStats.size());
     StorageStatsManager storageStatsManager = (StorageStatsManager) diskUsage.getSystemService(Context.STORAGE_STATS_SERVICE);
-    final ArrayList<FileSystemEntry> entries = new ArrayList<FileSystemEntry>();
+    final ArrayList<FileSystemEntry> entries = new ArrayList<>();
     PackageManager packageManager = diskUsage.getApplicationContext().getPackageManager();
     final Set<String> packages = new HashSet<>();
     for (UsageStats s : queryUsageStats) {

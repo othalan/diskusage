@@ -72,13 +72,13 @@ public final class WireFormatNano {
     return (fieldNumber << TAG_TYPE_BITS) | wireType;
   }
 
-  public static final int EMPTY_INT_ARRAY[] = {};
-  public static final long EMPTY_LONG_ARRAY[] = {};
-  public static final float EMPTY_FLOAT_ARRAY[] = {};
-  public static final double EMPTY_DOUBLE_ARRAY[] = {};
-  public static final boolean EMPTY_BOOLEAN_ARRAY[] = {};
-  public static final String EMPTY_STRING_ARRAY[] = {};
-  public static final byte[] EMPTY_BYTES_ARRAY[] = {};
+  public static final int[] EMPTY_INT_ARRAY = {};
+  public static final long[] EMPTY_LONG_ARRAY = {};
+  public static final float[] EMPTY_FLOAT_ARRAY = {};
+  public static final double[] EMPTY_DOUBLE_ARRAY = {};
+  public static final boolean[] EMPTY_BOOLEAN_ARRAY = {};
+  public static final String[] EMPTY_STRING_ARRAY = {};
+  public static final byte[][] EMPTY_BYTES_ARRAY = {};
   public static final byte[] EMPTY_BYTES = {};
 
   /**

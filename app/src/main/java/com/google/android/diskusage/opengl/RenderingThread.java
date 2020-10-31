@@ -1,13 +1,5 @@
 package com.google.android.diskusage.opengl;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
-
-import javax.microedition.khronos.opengles.GL10;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,19 +10,26 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLUtils;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.android.diskusage.FileSystemState;
 import com.google.android.diskusage.R;
 import com.google.android.diskusage.entity.FileSystemEntry;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
+
+import javax.microedition.khronos.opengles.GL10;
+
 
 public class RenderingThread extends AbstractRenderingThread {
-  private Context context;
-  private FileSystemState eventHandler;
+  private final Context context;
+  private final FileSystemState eventHandler;
   
-  private static final float vertexData[][] = {
+  private static final float[][] vertexData = {
     { 0.1f,  0.2f, 0},
     { 0.9f,  0.2f, 0},
     { 0.9f,  0.9f, 0},
@@ -66,7 +65,7 @@ public class RenderingThread extends AbstractRenderingThread {
   
 //  private float[] dirVertexes = new float[MAX_VERTEX * 3];
 //private float[] fileVertexes = new float[MAX_VERTEX * 3];
-  private float[] textureVertexes = new float[4 * 3];
+  private final float[] textureVertexes = new float[4 * 3];
   
   
   private BitmapMap currentBitmapMap;
@@ -222,9 +221,9 @@ public class RenderingThread extends AbstractRenderingThread {
           GL10.GL_UNSIGNED_SHORT, indicies);
       nrects = 0;
     }
-  };
-  
-  public class SmallSquare {
+  }
+
+    public class SmallSquare {
     private int nrects = 0;
     private final int texture_id;
     private final float[] vertexes = new float[MAX_VERTEX * 3];
@@ -324,9 +323,9 @@ public class RenderingThread extends AbstractRenderingThread {
           GL10.GL_UNSIGNED_SHORT, indicies);
       gl.glDisable(GL10.GL_BLEND);
     }
-  };
+  }
 
-  public int newTextureId() {
+    public int newTextureId() {
     int[] ids = new int[1];
     gl.glGenTextures(1, ids, 0);
     return ids[0];

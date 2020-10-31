@@ -24,8 +24,7 @@ public abstract class PortableResult {
       throw new RuntimeException("cannot replay - no data");
     }
     if (status.exception != null) {
-      Exception e = PortableExceptionProtoImpl.create(status.exception);
-      throw e;
+      throw PortableExceptionProtoImpl.create(status.exception);
     } else if (status.evaluated) {
       // all good
     } else {

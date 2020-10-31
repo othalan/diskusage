@@ -37,7 +37,7 @@ public final class FileSystemViewCPU extends View implements FileSystemView {
   public void requestRepaintGPU() {
   }
   public void requestRepaint(int l, int t, int r, int b) {
-    invalidate(l, t, r, b);
+    invalidate();
   }
 
   @Override

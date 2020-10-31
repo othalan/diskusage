@@ -1,5 +1,8 @@
 package com.google.android.diskusage.opengl;
 
+import android.util.Log;
+import android.view.SurfaceHolder;
+
 import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -9,9 +12,6 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.util.Log;
-import android.view.SurfaceHolder;
-
 public abstract class AbstractRenderingThread extends Thread {
   public abstract boolean renderFrame(GL10 gl);
   public abstract void sizeChanged(GL10 gl, int w, int h);
@@ -20,9 +20,9 @@ public abstract class AbstractRenderingThread extends Thread {
   
   private class ExitException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-  };
-  
-  private ArrayList<Runnable> events = new ArrayList<Runnable>();
+  }
+
+    private final ArrayList<Runnable> events = new ArrayList<>();
   /**
    * True when surfaceAvailable callback was received from surfaceHolder and 
    * surfaceDestroyed wasn't yet received.
@@ -76,7 +76,7 @@ public abstract class AbstractRenderingThread extends Thread {
   
   public void runEvents() throws InterruptedException {
     while (true) {
-      Runnable e = null;
+      Runnable e;
       synchronized (events) {
         if (events.isEmpty()) {
           if (stopRenderingThread && !surfaceAvailable) {
@@ -112,8 +112,8 @@ public abstract class AbstractRenderingThread extends Thread {
   }
   
   public class SurfaceAvailableEvent extends ControlEvent {
-    private boolean a;
-    private SurfaceHolder holder;
+    private final boolean a;
+    private final SurfaceHolder holder;
     
     public SurfaceAvailableEvent(SurfaceHolder holder, boolean available) {
       this.holder = holder;
@@ -125,7 +125,7 @@ public abstract class AbstractRenderingThread extends Thread {
         eglTools.initSurface(holder);
         createResources(gl);
       } else {
-        eglTools.destroySurface(holder);
+        eglTools.destroySurface();
         releaseResources(gl);
       }
     }
@@ -172,7 +172,7 @@ public abstract class AbstractRenderingThread extends Thread {
       };
 
       final EGLConfig[] matched_configs = new EGLConfig[1];
-      int num_configs[] = new int[1];
+      int[] num_configs = new int[1];
       egl.eglChooseConfig(eglDisplay, configSpec, matched_configs, 1, num_configs);
       eglConfig = matched_configs[0];
       
@@ -197,7 +197,7 @@ public abstract class AbstractRenderingThread extends Thread {
       }
     }
     
-    public void destroySurface(SurfaceHolder holder) {
+    public void destroySurface() {
       Log.d("diskusage", "*** destroy surface ***");
       try {
         egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE,
@@ -221,5 +221,5 @@ public abstract class AbstractRenderingThread extends Thread {
       repaintEvent = true;
       events.notify();
     }
-  };
+  }
 }

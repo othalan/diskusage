@@ -19,26 +19,23 @@
 
 package com.google.android.diskusage;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.google.android.diskusage.datasource.DataSource;
-import com.google.android.diskusage.entity.FileSystemEntry;
-import com.google.android.diskusage.entity.FileSystemPackage;
-
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.diskusage.datasource.DataSource;
+import com.google.android.diskusage.entity.FileSystemEntry;
+import com.google.android.diskusage.entity.FileSystemPackage;
+
+import java.io.File;
+import java.io.IOException;
+
 public class BackgroundDelete extends Thread {
   ProgressDialog dialog;
   File file;
   String path;
-  String rootPath;
   DiskUsage diskUsage;
   FileSystemEntry entry;
 
@@ -47,7 +44,6 @@ public class BackgroundDelete extends Thread {
   private static final int DELETION_CANCELED = 2;
   private static final int DELETION_IN_PROGRESS = 3;
   private volatile boolean cancelDeletion;
-  private boolean backgroundDeletion;
   private int deletionStatus = DELETION_IN_PROGRESS;
   private int numDeletedDirectories = 0;
   private int numDeletedFiles = 0;
@@ -89,31 +85,11 @@ public class BackgroundDelete extends Thread {
     dialog.setMessage(format(R.string.deleting_path, path));
     dialog.setIndeterminate(true);
     dialog.setButton(diskUsage.getString(R.string.button_background),
-        new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        background();
-        dialog = null;
-      }
-    });
+            (dialog, which) -> background());
     dialog.setButton2(diskUsage.getString(R.string.button_cancel),
-        new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        cancel();
-        dialog = null;
-      }
-    });
-    dialog.setOnDismissListener(new OnDismissListener() {
-      @Override
-      public void onDismiss(DialogInterface x) {
-        dialog = null;
-      }
-    });
-    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-      @Override
-      public void onCancel(DialogInterface x) {
-        dialog = null;
-      }
-    });
+            (dialog, which) -> cancel());
+    dialog.setOnDismissListener(x -> dialog = null);
+    dialog.setOnCancelListener(x -> dialog = null);
     dialog.show();
     start();
   }
@@ -133,30 +109,28 @@ public class BackgroundDelete extends Thread {
   public void run() {
     deletionStatus = deleteRecursively(file);
     // FIXME: use notification object when backgrounded
-    diskUsage.handler.post(new Runnable() {
-      public void run() {
-        if (dialog != null) {
-          try {
-            dialog.dismiss();
-          } catch (Exception e) {
-            // ignore exception
-          }
+    diskUsage.handler.post(() -> {
+      if (dialog != null) {
+        try {
+          dialog.dismiss();
+        } catch (Exception e) {
+          // ignore exception
         }
-        diskUsage.fileSystemState.removeInRenderThread(entry);
-        if (deletionStatus != DELETION_SUCCESS) {
-          restore();
-          diskUsage.fileSystemState.requestRepaint();
-          diskUsage.fileSystemState.requestRepaintGPU();
-        }
-        notifyUser();
       }
+      diskUsage.fileSystemState.removeInRenderThread(entry);
+      if (deletionStatus != DELETION_SUCCESS) {
+        restore();
+        diskUsage.fileSystemState.requestRepaint();
+        diskUsage.fileSystemState.requestRepaintGPU();
+      }
+      notifyUser();
     });
   }
 
   public void restore() {
     Log.d("DiskUsage", "restore started for " + path);
     MountPoint mountPoint = MountPoint.getForKey(diskUsage, diskUsage.getKey());
-    int displayBlockSize = diskUsage.fileSystemState.masterRoot.getDisplayBlockSize();
+    long displayBlockSize = diskUsage.fileSystemState.masterRoot.getDisplayBlockSize();
     try {
       FileSystemEntry newEntry = new Scanner(
               // FIXME: hacked allocatedBlocks and heap size
@@ -164,7 +138,7 @@ public class BackgroundDelete extends Thread {
               DataSource.get().createLegacyScanFile(mountPoint.getRoot() + "/" + path));
       // FIXME: may be problems in case of two deletions
       entry.parent.insert(newEntry, displayBlockSize);
-      diskUsage.fileSystemState.restore(newEntry);
+      diskUsage.fileSystemState.restore();
       Log.d("DiskUsage", "restoring undeleted: "
               + newEntry.name + " " + newEntry.sizeString());
     } catch (IOException e) {
@@ -196,9 +170,7 @@ public class BackgroundDelete extends Thread {
 
   }
 
-  public void background() {
-    backgroundDeletion = true;
-  }
+  public void background() { }
 
   public void cancel() {
     cancelDeletion = true;
@@ -210,8 +182,8 @@ public class BackgroundDelete extends Thread {
     if (isDirectory) {
       final File[] files = directory.listFiles();
       if (files == null) return DELETION_FAILED;
-      for (int i = 0; i < files.length; i++) {
-        int status = deleteRecursively(files[i]);
+      for (File value : files) {
+        int status = deleteRecursively(value);
         if (status != DELETION_SUCCESS) return status;
       }
     }

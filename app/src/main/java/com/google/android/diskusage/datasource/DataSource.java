@@ -1,12 +1,5 @@
 package com.google.android.diskusage.datasource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -14,6 +7,13 @@ import android.os.Build;
 
 import com.google.android.diskusage.LoadableActivity;
 import com.google.android.diskusage.datasource.fast.DefaultDataSource;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.List;
 
 public abstract class DataSource {
   private static DataSource currentDataSource = new DefaultDataSource();

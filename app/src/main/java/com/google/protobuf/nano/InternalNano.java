@@ -34,6 +34,7 @@ import com.google.protobuf.nano.MapFactories.MapFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,8 +68,8 @@ public final class InternalNano {
   public static final int TYPE_SINT32   = 17;
   public static final int TYPE_SINT64   = 18;
 
-  protected static final Charset UTF_8 = Charset.forName("UTF-8");
-  protected static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+  protected static final Charset UTF_8 = StandardCharsets.UTF_8;
+  protected static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
 
   private InternalNano() {}
 

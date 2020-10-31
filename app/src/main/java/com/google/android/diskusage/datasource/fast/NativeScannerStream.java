@@ -1,17 +1,18 @@
 package com.google.android.diskusage.datasource.fast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 
 import com.google.android.diskusage.datasource.DataSource;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class NativeScannerStream extends InputStream {
 
@@ -51,7 +52,6 @@ public class NativeScannerStream extends InputStream {
 
   static class Factory {
     private final Context context;
-    private static boolean remove = true;
 
     Factory(Context context) {
       this.context = context;
@@ -93,7 +93,7 @@ public class NativeScannerStream extends InputStream {
         }
 
         OutputStream os = process.getOutputStream();
-        os.write((getScanBinaryPath(binaryName) + " " + root).getBytes("UTF-8"));
+        os.write((getScanBinaryPath(binaryName) + " " + root).getBytes(StandardCharsets.UTF_8));
         os.flush();
         os.close();
       }
@@ -121,14 +121,12 @@ public class NativeScannerStream extends InputStream {
     }
 
     private void runChmod(String binaryName)
-        throws IOException, InterruptedException {
-      if (Integer.parseInt(Build.VERSION.SDK) >= VERSION_CODES.GINGERBREAD) {
-        try {
-          setExecutable(binaryName);
-          return;
-        } catch (Exception e) {
-          // fall back to legacy way
-        }
+        throws InterruptedException {
+      try {
+        setExecutable(binaryName);
+        return;
+      } catch (Exception e) {
+        // fall back to legacy way
       }
       Process process;
       try {
@@ -147,7 +145,7 @@ public class NativeScannerStream extends InputStream {
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private void setExecutable(String binaryName) {
-      if (new File(binaryName).setExecutable(true, true) == false) {
+      if (!new File(binaryName).setExecutable(true, true)) {
         throw new RuntimeException("Failed to setExecutable");
       }
     }

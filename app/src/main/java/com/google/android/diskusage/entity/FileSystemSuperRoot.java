@@ -24,14 +24,14 @@ package com.google.android.diskusage.entity;
  * displayed root of filesystem.
  */
 public class FileSystemSuperRoot extends FileSystemSpecial {
-  final int blockSize;
+  final long blockSize;
 
-  public FileSystemSuperRoot(int blockSize) {
+  public FileSystemSuperRoot(long blockSize) {
     super(null, 0, blockSize);
     this.blockSize = blockSize;
   }
 
-  public int getDisplayBlockSize() {
+  public long getDisplayBlockSize() {
     return blockSize;
   }
 
@@ -41,7 +41,7 @@ public class FileSystemSuperRoot extends FileSystemSpecial {
   }
 
   @Override
-  public FileSystemEntry filter(CharSequence pattern, int blockSize) {
+  public FileSystemEntry filter(CharSequence pattern, long blockSize) {
     // don't match name
     return filterChildren(pattern, blockSize);
   }

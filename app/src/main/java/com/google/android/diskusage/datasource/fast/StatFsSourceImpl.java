@@ -1,7 +1,5 @@
 package com.google.android.diskusage.datasource.fast;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.StatFs;
 
 import com.google.android.diskusage.datasource.StatFsSource;
@@ -14,67 +12,36 @@ public class StatFsSourceImpl implements StatFsSource {
     this.statFs = new StatFs(path);
   }
 
-  @Deprecated
   @Override
-  public int getAvailableBlocks() {
-    return statFs.getAvailableBlocks();
-  }
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  @Override
-  public long getAvailableBlocksLong() {
+  public long getAvailableBlocks() {
     return statFs.getAvailableBlocksLong();
   }
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
   @Override
   public long getAvailableBytes() {
     return statFs.getAvailableBytes();
   }
 
-  @Deprecated
   @Override
-  public int getBlockCount() {
-    return statFs.getBlockCount();
-  }
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  @Override
-  public long getBlockCountLong() {
+  public long getBlockCount() {
     return statFs.getBlockCountLong();
   }
 
-  @Deprecated
   @Override
-  public int getBlockSize() {
-    return statFs.getBlockSize();
-  }
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  @Override
-  public long getBlockSizeLong() {
+  public long getBlockSize() {
     return statFs.getBlockSizeLong();
   }
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
   @Override
   public long getFreeBytes() {
     return statFs.getFreeBytes();
   }
 
-  @Deprecated
   @Override
-  public int getFreeBlocks() {
-    return statFs.getFreeBlocks();
-  }
-
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-  @Override
-  public long getFreeBlocksLong() {
+  public long getFreeBlocks() {
     return statFs.getFreeBlocksLong();
   }
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
   @Override
   public long getTotalBytes() {
     return statFs.getTotalBytes();

@@ -1,13 +1,12 @@
 package com.google.android.diskusage.datasource.fast;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Environment;
 
 import com.google.android.diskusage.datasource.PortableFile;
+
+import java.io.File;
 
 public class PortableFileImpl implements PortableFile {
   private final File file;

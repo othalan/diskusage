@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -31,16 +30,15 @@ import android.os.Bundle;
 import android.provider.Settings;
 
 public class PermissionRequestActivity extends Activity {
-    private static int DISKUSAGE_REQUEST_CODE = 10;
-    private static int ASK_PERMISSION_REQUEST_CODE = 11;
+    private static final int DISKUSAGE_REQUEST_CODE = 10;
+    private static final int ASK_PERMISSION_REQUEST_CODE = 11;
 
-    private String key;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent i = getIntent();
 
-        key = i.getStringExtra(DiskUsage.KEY_KEY);
+        String key = i.getStringExtra(DiskUsage.KEY_KEY);
         if (key == null) {
             // Just close instead of crashing later
             finish();
@@ -60,19 +58,11 @@ public class PermissionRequestActivity extends Activity {
         new AlertDialog.Builder(this)
                 .setTitle("Usage Access permision needed")
                 .setMessage("Allow DiskUsage to get list of installed apps?")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                        startActivityForResult(intent, ASK_PERMISSION_REQUEST_CODE);
-                    }
+                .setPositiveButton("Ok", (dialogInterface, i1) -> {
+                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                    startActivityForResult(intent, ASK_PERMISSION_REQUEST_CODE);
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        forwardToDiskUsage();
-                    }
-                }).create().show();
+                .setNegativeButton("Cancel", (dialogInterface, i12) -> forwardToDiskUsage()).create().show();
     }
 
     public void forwardToDiskUsage() {
@@ -98,11 +88,9 @@ public class PermissionRequestActivity extends Activity {
             PackageManager packageManager = getPackageManager();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getPackageName(), 0);
             AppOpsManager appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
-            int mode = 0;
-            if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.KITKAT) {
-                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                        applicationInfo.uid, applicationInfo.packageName);
-            }
+            int mode;
+            mode = appOpsManager.unsafeCheckOp(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    applicationInfo.uid, applicationInfo.packageName);
             return (mode == AppOpsManager.MODE_ALLOWED);
 
         } catch (PackageManager.NameNotFoundException e) {

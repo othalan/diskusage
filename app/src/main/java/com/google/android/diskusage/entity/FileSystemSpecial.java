@@ -22,25 +22,19 @@ package com.google.android.diskusage.entity;
 
 public class FileSystemSpecial extends FileSystemEntry {
 
-  public FileSystemSpecial(String name, long size, int blockSize) {
+  public FileSystemSpecial(String name, long size, long blockSize) {
     super(null, name);
     initSizeInBytes(size, blockSize);
   }
-  
-  public FileSystemSpecial(String name, FileSystemEntry[] children, int blockSize) {
-    super(null, name);
-    this.setChildren(children, blockSize);
-  }
 
   @Override
-  public FileSystemEntry filter(CharSequence pattern, int blockSize) {
+  public FileSystemEntry filter(CharSequence pattern, long blockSize) {
     return filterChildren(pattern, blockSize);
   }
   
   @Override
   public FileSystemEntry create() {
     // dummy values for size
-    FileSystemSpecial copy = new FileSystemSpecial(this.name, 0, 512);
-    return copy;
+    return new FileSystemSpecial(this.name, 0, 512);
   }
 }

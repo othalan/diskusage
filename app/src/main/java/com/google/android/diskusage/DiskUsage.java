@@ -21,13 +21,10 @@ package com.google.android.diskusage;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.AppOpsManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
@@ -36,7 +33,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.FileUriExposedException;
 import android.os.Handler;
-import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -108,10 +104,10 @@ public class DiskUsage extends LoadableActivity {
     if (receivedState != null) onRestoreInstanceState(receivedState);
   }
 
-  ArrayList<Runnable> afterLoadAction = new ArrayList<Runnable>();
+  ArrayList<Runnable> afterLoadAction = new ArrayList<>();
 
-  public void applyPatternNewRoot(FileSystemSuperRoot newRoot, String searchQuery) {
-    fileSystemState.replaceRootKeepCursor(newRoot, searchQuery);
+  public void applyPatternNewRoot(FileSystemSuperRoot newRoot) {
+    fileSystemState.replaceRootKeepCursor(newRoot);
   }
 
   @Override
@@ -130,22 +126,19 @@ public class DiskUsage extends LoadableActivity {
       }
       pkg_removed = null;
     }
-    LoadFiles(this, new AfterLoad() {
-      @Override
-      public void run(final FileSystemSuperRoot root, boolean isCached) {
-        fileSystemState = new FileSystemState(DiskUsage.this, root);
-        rendererManager.makeView(fileSystemState, root);
-        fileSystemState.startZoomAnimationInRenderThread(null, !isCached, false);
+    LoadFiles(this, (root, isCached) -> {
+      fileSystemState = new FileSystemState(DiskUsage.this, root);
+      rendererManager.makeView(fileSystemState, root);
+      fileSystemState.startZoomAnimationInRenderThread(null, !isCached);
 
-        for (Runnable r : afterLoadAction) {
-          r.run();
-        }
-        afterLoadAction.clear();
-        if (pathToDelete != null) {
-          String path = pathToDelete;
-          pathToDelete = null;
-          continueDelete(path);
-        }
+      for (Runnable r : afterLoadAction) {
+        r.run();
+      }
+      afterLoadAction.clear();
+      if (pathToDelete != null) {
+        String path = pathToDelete;
+        pathToDelete = null;
+        continueDelete(path);
       }
     }, false);
   }
@@ -158,12 +151,7 @@ public class DiskUsage extends LoadableActivity {
       fileSystemState.killRenderThread();
       final Bundle savedState = new Bundle();
       fileSystemState.saveState(savedState);
-      afterLoadAction.add(new Runnable() {
-        @Override
-        public void run() {
-          fileSystemState.restoreStateInRenderThread(savedState);
-        }
-      });
+      afterLoadAction.add(() -> fileSystemState.restoreStateInRenderThread(savedState));
     }
   }
 
@@ -183,7 +171,7 @@ public class DiskUsage extends LoadableActivity {
 
     public static VersionedPackageViewer newInstance(DiskUsage context) {
       final int sdkVersion = DataSource.get().getAndroidVersion();
-      VersionedPackageViewer viewer = null;
+      VersionedPackageViewer viewer;
       if (sdkVersion < Build.VERSION_CODES.GINGERBREAD) {
         viewer = context.new EclairPackageViewer();
       } else {
@@ -240,7 +228,7 @@ public class DiskUsage extends LoadableActivity {
       BackgroundDelete.startDelete(this, entry);
     } else {
       Toast.makeText(this,
-          "Oops. Can't find directory to be deleted.", Toast.LENGTH_SHORT);
+          "Oops. Can't find directory to be deleted.", Toast.LENGTH_SHORT).show();
     }
   }
 
@@ -268,18 +256,10 @@ public class DiskUsage extends LoadableActivity {
           ? format(R.string.ask_to_delete_directory, path)
           : format(R.string.ask_to_delete_file, path))
       .setPositiveButton(str(R.string.button_delete),
-          new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          BackgroundDelete.startDelete(DiskUsage.this, entry);
-        }
-      })
+              (dialog, which) -> BackgroundDelete.startDelete(DiskUsage.this, entry))
       .setNegativeButton(str(R.string.button_cancel),
-          new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int whichButton) {
-        }
-      }).create().show();
+              (dialog, whichButton) -> {
+              }).create().show();
     } else {
       Intent i = new Intent(this, DeleteActivity.class);
       i.putExtra(DELETE_PATH_KEY, path);
@@ -317,7 +297,7 @@ public class DiskUsage extends LoadableActivity {
       viewPackage((FileSystemPackage) entry);
       return;
     }
-    if (entry.parent != null && entry.parent instanceof FileSystemPackage) {
+    if (entry.parent instanceof FileSystemPackage) {
       viewPackage((FileSystemPackage) entry.parent);
       return;
     }
@@ -328,7 +308,7 @@ public class DiskUsage extends LoadableActivity {
 
     if (file.isDirectory()) {
       // Go on with default file manager
-      // Shoud this be optional?
+      // Should this be optional?
       intent = new Intent(Intent.ACTION_VIEW);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       intent.setDataAndType(uri, "inode/directory");
@@ -336,7 +316,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         startActivity(intent);
         return;
-      } catch(ActivityNotFoundException e) {
+      } catch(ActivityNotFoundException ignored) {
       }
 
       intent = new Intent("org.openintents.action.VIEW_DIRECTORY");
@@ -346,7 +326,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         startActivity(intent);
         return;
-      } catch(ActivityNotFoundException|FileUriExposedException e) {
+      } catch(ActivityNotFoundException|FileUriExposedException ignored) {
       }
 
       intent = new Intent("org.openintents.action.PICK_DIRECTORY");
@@ -360,7 +340,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         startActivity(intent);
         return;
-      } catch(ActivityNotFoundException|FileUriExposedException e) {
+      } catch(ActivityNotFoundException|FileUriExposedException ignored) {
       }
 
       // old Astro
@@ -372,7 +352,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         startActivity(intent);
         return;
-      } catch(ActivityNotFoundException|FileUriExposedException e) {
+      } catch(ActivityNotFoundException|FileUriExposedException ignored) {
       }
 
       final Intent installSolidExplorer = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=pl.solidexplorer"));
@@ -385,17 +365,9 @@ public class DiskUsage extends LoadableActivity {
             "for integration with DiskUsage or install:" +
             "\n * Solid Explorer" +
             "\n * OI File Manager")
-            .setPositiveButton("Install Solid Explorer", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface arg0, int arg1) {
-                startActivity(installSolidExplorer);
-              }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface arg0, int arg1) {
-                // pass
-              }
+            .setPositiveButton("Install Solid Explorer", (arg0, arg1) -> startActivity(installSolidExplorer))
+            .setNegativeButton("Cancel", (arg0, arg1) -> {
+              // pass
             })
             .create().show();
       } else {
@@ -418,7 +390,7 @@ public class DiskUsage extends LoadableActivity {
         }
         startActivity(intent);
         return;
-      } catch (ActivityNotFoundException|FileUriExposedException e) {
+      } catch (ActivityNotFoundException|FileUriExposedException ignored) {
       }
     }
     Toast.makeText(this, str(R.string.no_viewer_found),
@@ -426,12 +398,7 @@ public class DiskUsage extends LoadableActivity {
   }
 
   public void rescan() {
-    LoadFiles(DiskUsage.this, new AfterLoad() {
-      @Override
-      public void run(FileSystemSuperRoot newRoot, boolean isCached) {
-        fileSystemState.startZoomAnimationInRenderThread(newRoot, !isCached, false);
-      }
-    }, true);
+    LoadFiles(DiskUsage.this, (newRoot, isCached) -> fileSystemState.startZoomAnimationInRenderThread(newRoot, !isCached), true);
   }
 
   public void finishOnBack() {
@@ -454,12 +421,10 @@ public class DiskUsage extends LoadableActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-          case android.R.id.home:
-            finishOnBack();
-            break;
-      }
-      return super.onOptionsItemSelected(item);
+    if (item.getItemId() == android.R.id.home) {
+      finishOnBack();
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
@@ -478,24 +443,17 @@ public class DiskUsage extends LoadableActivity {
     if (fileSystemState != null)
       fileSystemState.restoreStateInRenderThread(inState);
     else {
-      afterLoadAction.add(new Runnable() {
-        @Override
-        public void run() {
-          fileSystemState.restoreStateInRenderThread(inState);
-        }
-      });
+      afterLoadAction.add(() -> fileSystemState.restoreStateInRenderThread(inState));
     }
 
     menu.onRestoreInstanceState(inState);
   }
 
   public interface AfterLoad {
-    public void run(FileSystemSuperRoot root, boolean isCached);
+    void run(FileSystemSuperRoot root, boolean isCached);
   }
 
   Handler handler = new Handler();
-
-  private Runnable progressUpdater;
 
   static abstract class MemoryClass {
     abstract int maxHeap();
@@ -505,7 +463,7 @@ public class DiskUsage extends LoadableActivity {
       int maxHeap() {
         return 16 * 1024 * 1024;
       }
-    };
+    }
 
     static MemoryClass getInstance(DiskUsage diskUsage) {
       final int sdkVersion = DataSource.get().getAndroidVersion();
@@ -515,7 +473,7 @@ public class DiskUsage extends LoadableActivity {
         return diskUsage.new MemoryClassDetected();
       }
     }
-  };
+  }
 
   class MemoryClassDetected extends MemoryClass {
     @Override
@@ -533,7 +491,7 @@ public class DiskUsage extends LoadableActivity {
   }
 
   static class FileSystemStats {
-    final int blockSize;
+    final long blockSize;
     final long freeBlocks;
     final long busyBlocks;
     final long totalBlocks;
@@ -562,12 +520,12 @@ public class DiskUsage extends LoadableActivity {
           FileSystemEntry.calcSizeString(busyBlocks * blockSize),
           FileSystemEntry.calcSizeString(totalBlocks * blockSize));
     }
-  };
+  }
 
   public interface ProgressGenerator {
     FileSystemEntry lastCreatedFile();
     long pos();
-  };
+  }
 
   Runnable makeProgressUpdater(final ProgressGenerator scanner,
       final FileSystemStats stats) {
@@ -593,11 +551,11 @@ public class DiskUsage extends LoadableActivity {
   @Override
   FileSystemSuperRoot scan() throws IOException, InterruptedException {
     final MountPoint mountPoint = MountPoint.getForKey(this, key);
-    final MountPoint realMountPoint = mountPoint;
     final FileSystemStats stats = new FileSystemStats(mountPoint);
     int heap = getMemoryQuota();
 
     FileSystemEntry rootElement;
+    Runnable progressUpdater;
     try {
       final NativeScanner scanner = new NativeScanner(this, stats.blockSize, stats.busyBlocks, heap);
       progressUpdater = makeProgressUpdater(scanner, stats);
@@ -612,19 +570,17 @@ public class DiskUsage extends LoadableActivity {
       handler.removeCallbacks(progressUpdater);
     }
 
-    ArrayList<FileSystemEntry> entries = new ArrayList<FileSystemEntry>();
+    ArrayList<FileSystemEntry> entries = new ArrayList<>();
 
     if (rootElement.children != null) {
-      for (FileSystemEntry e : rootElement.children) {
-        entries.add(e);
-      }
+      Collections.addAll(entries, rootElement.children);
     }
 
     if (mountPoint.hasApps()) {
       FileSystemRoot media = (FileSystemRoot) FileSystemRoot.makeNode(
-          "media", realMountPoint.getRoot(), false).setChildren(entries.toArray(new FileSystemEntry[0]),
+          "media", mountPoint.getRoot(), false).setChildren(entries.toArray(new FileSystemEntry[0]),
               stats.blockSize);
-      entries = new ArrayList<FileSystemEntry>();
+      entries = new ArrayList<>();
       entries.add(media);
 
       FileSystemEntry[] appList = loadApps2SD(stats.blockSize);
@@ -641,7 +597,7 @@ public class DiskUsage extends LoadableActivity {
     }
 
     long systemBlocks = stats.totalBlocks - stats.freeBlocks - visibleBlocks;
-    Collections.sort(entries, FileSystemEntry.COMPARE);
+    entries.sort(FileSystemEntry.COMPARE);
     if (systemBlocks > 0) {
       entries.add(new FileSystemSystemSpace(getString(R.string.graph_system_data), systemBlocks * stats.blockSize, stats.blockSize));
       entries.add(new FileSystemFreeSpace(getString(R.string.graph_free_space), stats.freeBlocks * stats.blockSize, stats.blockSize));
@@ -659,7 +615,7 @@ public class DiskUsage extends LoadableActivity {
     return newRoot;
   }
 
-  protected FileSystemEntry[] loadApps2SD(int blockSize) {
+  protected FileSystemEntry[] loadApps2SD(long blockSize) {
     try {
       return (new Apps2SDLoader(this).load(blockSize));
     } catch (Throwable t) {
@@ -668,7 +624,7 @@ public class DiskUsage extends LoadableActivity {
     }
   }
 
-  void moveIntoPackage(FileSystemPackage pkg, FileSystemRoot root, String path, String newName, FileSystemPackage.ChildType type, int blockSize) {
+  void moveIntoPackage(FileSystemPackage pkg, FileSystemRoot root, String path, String newName, FileSystemPackage.ChildType type, long blockSize) {
     FileSystemEntry e = root.getByAbsolutePath(path);
     if (e != null) {
       e.remove(blockSize);
@@ -678,14 +634,14 @@ public class DiskUsage extends LoadableActivity {
     }
   }
 
-  void moveAppData(FileSystemEntry[] apps, FileSystemRoot media, int blockSize) {
+  void moveAppData(FileSystemEntry[] apps, FileSystemRoot media, long blockSize) {
     String diskusage = "com.google.android.diskusage";
     for (FileSystemEntry a : apps) {
       FileSystemPackage app = (FileSystemPackage)  a;
       try {
         String cacheDir = getCacheDir().getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, cacheDir, "Cache", FileSystemPackage.ChildType.CACHE, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -693,7 +649,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         String dir = getCodeCacheDir().getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, dir, "CodeCache", FileSystemPackage.ChildType.CACHE, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -701,7 +657,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         String dir = getExternalCacheDir().getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, dir, "ExternalCache", FileSystemPackage.ChildType.CACHE, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -709,7 +665,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         String dir = getDataDir().getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, dir, "Data", FileSystemPackage.ChildType.DATA, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -717,7 +673,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         String dir = getFilesDir().getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, dir, "InternalFiles", FileSystemPackage.ChildType.DATA, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
 
@@ -726,7 +682,7 @@ public class DiskUsage extends LoadableActivity {
       try {
         String dir = getExternalFilesDir(null).getCanonicalPath().replaceAll(diskusage, app.pkg);
         moveIntoPackage(app, media, dir, "Files", FileSystemPackage.ChildType.DATA, blockSize);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -736,7 +692,7 @@ public class DiskUsage extends LoadableActivity {
           String dir = mediaDir.getCanonicalPath().replaceAll(diskusage, app.pkg);
           moveIntoPackage(app, media, dir, "MediaFiles", FileSystemPackage.ChildType.DATA, blockSize);
         }
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
     for (FileSystemEntry a : apps) {
@@ -746,7 +702,7 @@ public class DiskUsage extends LoadableActivity {
           String dir = mediaDir.getCanonicalPath().replaceAll(diskusage, app.pkg);
           moveIntoPackage(app, media, dir, "Obb", FileSystemPackage.ChildType.CODE, blockSize);
         }
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
 

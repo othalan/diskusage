@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
-import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
@@ -67,14 +66,11 @@ public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
       searchView.setIconified(false);
       searchView.setQuery(searchPattern, false);
     }
-    searchView.setOnCloseListener(new OnCloseListener() {
-      @Override
-      public boolean onClose() {
-        Log.d("diskusage", "search closed");
-        searchPattern = null;
-        diskusage.applyPatternNewRoot(masterRoot, null);
-        return false;
-      }
+    searchView.setOnCloseListener(() -> {
+      Log.d("diskusage", "search closed");
+      searchPattern = null;
+      diskusage.applyPatternNewRoot(masterRoot);
+      return false;
     });
     searchView.setOnQueryTextListener(new OnQueryTextListener() {
       @Override
@@ -95,10 +91,9 @@ public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
   }
   
   @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
+  public void onPrepareOptionsMenu(Menu menu) {
     super.onPrepareOptionsMenu(menu);
     setShowAsAction(showMenuItem);
-    return true;
   }
 
 

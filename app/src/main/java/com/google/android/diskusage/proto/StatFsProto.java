@@ -39,10 +39,7 @@ public final class StatFsProto extends
   public long blockCountLong;
 
   // optional int32 block_size = 7;
-  public int blockSize;
-
-  // optional int64 block_size_long = 8;
-  public long blockSizeLong;
+  public long blockSize;
 
   // optional int64 free_bytes = 9;
   public long freeBytes;
@@ -67,8 +64,7 @@ public final class StatFsProto extends
     availableBytes = 0L;
     blockCount = 0;
     blockCountLong = 0L;
-    blockSize = 0;
-    blockSizeLong = 0L;
+    blockSize = 0L;
     freeBytes = 0L;
     freeBlocks = 0;
     freeBlocksLong = 0L;
@@ -99,10 +95,7 @@ public final class StatFsProto extends
       output.writeInt64(6, this.blockCountLong);
     }
     if (this.blockSize != 0) {
-      output.writeInt32(7, this.blockSize);
-    }
-    if (this.blockSizeLong != 0L) {
-      output.writeInt64(8, this.blockSizeLong);
+      output.writeInt64(7, this.blockSize);
     }
     if (this.freeBytes != 0L) {
       output.writeInt64(9, this.freeBytes);
@@ -148,11 +141,7 @@ public final class StatFsProto extends
     }
     if (this.blockSize != 0) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeInt32Size(7, this.blockSize);
-    }
-    if (this.blockSizeLong != 0L) {
-      size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeInt64Size(8, this.blockSizeLong);
+          .computeInt64Size(7, this.blockSize);
     }
     if (this.freeBytes != 0L) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
@@ -213,11 +202,7 @@ public final class StatFsProto extends
           break;
         }
         case 56: {
-          this.blockSize = input.readInt32();
-          break;
-        }
-        case 64: {
-          this.blockSizeLong = input.readInt64();
+          this.blockSize = input.readInt64();
           break;
         }
         case 72: {

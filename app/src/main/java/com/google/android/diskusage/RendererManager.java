@@ -2,10 +2,7 @@ package com.google.android.diskusage;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
 import android.view.View;
 
@@ -36,10 +33,8 @@ public class RendererManager {
   public boolean isHardwareRendererSupported() {
     final int sdkVersion = DataSource.get().getAndroidVersion();
     if (android.os.Build.DEVICE.equals("bravo")) {
-      if (sdkVersion >= Build.VERSION_CODES.ECLAIR
-          && sdkVersion <= Build.VERSION_CODES.GINGERBREAD) {
-        return false;
-      }
+        return sdkVersion < Build.VERSION_CODES.ECLAIR
+                || sdkVersion > Build.VERSION_CODES.GINGERBREAD;
     }
     return true;
   }
@@ -63,18 +58,10 @@ public class RendererManager {
       .setTitle("WARNING!")
       .setMessage("Hardware renderer may CRASH your PHONE.\n\n" +
       "There is a firmware bug in a number of HTC phones with Android 2.2 (Froyo).")
-      .setPositiveButton("Proceeed", new OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-          finishRendererSwitch(root);
-        }
+      .setPositiveButton("Proceeed", (dialog, which) -> finishRendererSwitch(root))
+      .setNegativeButton("Cancel", (dialog, which) -> {
       })
-      .setNegativeButton("Cancel", new OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-        }
-      })
-      .setOnCancelListener(new OnCancelListener() {
-        public void onCancel(DialogInterface dialog) {
-        }
+      .setOnCancelListener(dialog -> {
       }).create().show();
       return;
     }
@@ -109,7 +96,7 @@ public class RendererManager {
 
   public void onPause() {
     if (rendererChanged) {
-      getPrefs().edit().putBoolean(HW_RENDERER, hwRenderer).commit();
+      getPrefs().edit().putBoolean(HW_RENDERER, hwRenderer).apply();
     }
   }
 }

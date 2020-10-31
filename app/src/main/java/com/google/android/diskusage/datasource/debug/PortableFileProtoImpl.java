@@ -17,7 +17,7 @@ public class PortableFileProtoImpl implements PortableFile {
   }
 
   public static PortableFileProtoImpl make(PortableFileProto proto, int androidVersion) {
-    if (proto.absolutePath != "" && proto.absolutePath != null) {
+    if (!proto.absolutePath.equals("")) {
       return new PortableFileProtoImpl(proto, androidVersion);
     } else {
       return null;

@@ -29,10 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class MountPoint {
-  private String title;
+  private final String title;
   private final String root;
   private final boolean forceHasApps;
 
@@ -70,10 +69,6 @@ public class MountPoint {
 
   private static List<MountPoint> mountPoints = new ArrayList<>();
   private static Map<String,MountPoint> mountPointForKey = new HashMap<>();
-
-  int getChecksum() {
-    return RootMountPoint.checksum;
-  }
 
   public static MountPoint getForKey(Context context, String key) {
     initMountPoints(context);

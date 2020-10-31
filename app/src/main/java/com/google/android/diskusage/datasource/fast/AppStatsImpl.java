@@ -26,9 +26,9 @@ class AppStatsImpl implements AppStats {
   @Override
   public long getCodeSize() {
     return packageStats.codeSize;
-  };
+  }
 
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalCacheSize() {
     return packageStats.externalCacheSize;
@@ -38,23 +38,23 @@ class AppStatsImpl implements AppStats {
   @Override
   public long getExternalCodeSize() {
     return packageStats.externalCodeSize;
-  };
+  }
 
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalDataSize() {
     return packageStats.externalDataSize;
-  };
+  }
 
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalMediaSize() {
     return packageStats.externalMediaSize;
-  };
+  }
 
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalObbSize() {
     return packageStats.externalObbSize;
-  };
+  }
 }

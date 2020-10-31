@@ -1,8 +1,5 @@
 package com.google.android.diskusage;
 
-import com.google.android.diskusage.entity.FileSystemSuperRoot;
-
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
@@ -10,13 +7,14 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.MenuItem.OnMenuItemClickListener;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+
+import com.google.android.diskusage.entity.FileSystemSuperRoot;
 
 public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
   private String searchPattern;

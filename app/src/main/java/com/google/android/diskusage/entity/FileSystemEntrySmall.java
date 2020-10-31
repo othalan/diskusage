@@ -37,7 +37,7 @@ public class FileSystemEntrySmall extends FileSystemEntry {
   }
 
   @Override
-  public FileSystemEntry filter(CharSequence pattern, int blockSize) {
+  public FileSystemEntry filter(CharSequence pattern, long blockSize) {
     return null;
   }
 }

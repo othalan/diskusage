@@ -1,9 +1,5 @@
 package com.google.android.diskusage;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -14,6 +10,10 @@ import android.preference.PreferenceScreen;
 
 import com.google.android.diskusage.DiskUsage.FileSystemStats;
 import com.google.android.diskusage.entity.FileSystemEntry;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ShowHideMountPointsActivity extends PreferenceActivity {
   @Override
@@ -59,6 +59,6 @@ public class ShowHideMountPointsActivity extends PreferenceActivity {
         editor.putBoolean(root, true);
       }
     }
-    editor.commit();
+    editor.apply();
   }
 }

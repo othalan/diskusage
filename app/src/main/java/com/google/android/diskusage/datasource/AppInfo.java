@@ -13,5 +13,5 @@ public interface AppInfo {
   String getSourceDir();
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   String[] getSplitSourceDirs();
-  public String getApplicationLabel();
+  String getApplicationLabel();
 }

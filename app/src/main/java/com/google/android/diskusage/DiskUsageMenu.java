@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.MenuItem.OnMenuItemClickListener;
 
 import com.google.android.diskusage.datasource.DataSource;
 import com.google.android.diskusage.entity.FileSystemEntry;
-import com.google.android.diskusage.entity.FileSystemFile;
 import com.google.android.diskusage.entity.FileSystemSpecial;
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
 
@@ -74,18 +72,8 @@ public abstract class DiskUsageMenu {
   public boolean finishedSearch(FileSystemSuperRoot newRoot, String searchQuery) {
     boolean matched = newRoot != null;
     if (!matched) newRoot = masterRoot;
-    diskusage.applyPatternNewRoot(newRoot, searchQuery);
+    diskusage.applyPatternNewRoot(newRoot);
     return matched;
-  }
-
-  public void addRescanMenuEntry(Menu menu) {
-    menu.add(getString(R.string.button_rescan))
-    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        diskusage.rescan();
-        return true;
-      }
-    });
   }
 
   public void update(FileSystemEntry position) {
@@ -97,47 +85,38 @@ public abstract class DiskUsageMenu {
     return diskusage.getString(id);
   }
 
-  public boolean onPrepareOptionsMenu(Menu menu) {
+  public void onPrepareOptionsMenu(Menu menu) {
     menu.clear();
     searchMenuItem = makeSearchMenuEntry(menu);
 
     showMenuItem = menu.add(getString(R.string.button_show));
-    showMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        if (selectedEntity != null) {
-          diskusage.view(selectedEntity);
-        }
-        return true;
+    showMenuItem.setOnMenuItemClickListener(item -> {
+      if (selectedEntity != null) {
+        diskusage.view(selectedEntity);
       }
+      return true;
     });
     rescanMenuItem = menu.add(getString(R.string.button_rescan));
-    rescanMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        diskusage.rescan();
-        return true;
-      }
+    rescanMenuItem.setOnMenuItemClickListener(item -> {
+      diskusage.rescan();
+      return true;
     });
 
     deleteMenuItem = menu.add(getString(R.string.button_delete));
-    deleteMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        diskusage.askForDeletion(selectedEntity);
-        return true;
-      }
+    deleteMenuItem.setOnMenuItemClickListener(item -> {
+      diskusage.askForDeletion(selectedEntity);
+      return true;
     });
 
     rendererMenuItem = menu.add("Renderer");
     rendererMenuItem.setVisible(
         diskusage.rendererManager.isHardwareRendererSupported());
-    rendererMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        diskusage.rendererManager.switchRenderer(masterRoot);
-        return true;
-      }
+    rendererMenuItem.setOnMenuItemClickListener(item -> {
+      diskusage.rendererManager.switchRenderer(masterRoot);
+      return true;
     });
 
     updateMenu();
-    return true;
   }
 
   private void updateMenu() {

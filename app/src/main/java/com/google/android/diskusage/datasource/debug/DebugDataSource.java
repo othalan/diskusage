@@ -1,15 +1,5 @@
 package com.google.android.diskusage.datasource.debug;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -20,14 +10,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
-import com.google.android.diskusage.datasource.AppStats;
 import com.google.android.diskusage.datasource.AppStatsCallback;
 import com.google.android.diskusage.datasource.DataSource;
 import com.google.android.diskusage.datasource.LegacyFile;
 import com.google.android.diskusage.datasource.PkgInfo;
 import com.google.android.diskusage.datasource.PortableFile;
 import com.google.android.diskusage.datasource.StatFsSource;
-import com.google.android.diskusage.datasource.debug.PortableStreamProtoWriterImpl.CloseCallback;
 import com.google.android.diskusage.datasource.fast.DefaultDataSource;
 import com.google.android.diskusage.datasource.fast.StreamCopy;
 import com.google.android.diskusage.proto.AppInfoProto;
@@ -35,9 +23,18 @@ import com.google.android.diskusage.proto.AppStatsProto;
 import com.google.android.diskusage.proto.Dump;
 import com.google.android.diskusage.proto.NativeScanProto;
 import com.google.android.diskusage.proto.PortableFileProto;
-import com.google.android.diskusage.proto.PortableStreamProto;
 import com.google.android.diskusage.proto.StatFsProto;
 import com.google.protobuf.nano.MessageNano;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DebugDataSource extends DataSource {
   private final Dump dump;
@@ -51,8 +48,7 @@ public class DebugDataSource extends DataSource {
   private static File dumpFile() {
     String path = Environment.getExternalStorageDirectory().getPath()
         + "/diskusage.bin";
-    File dumpFile = new File(path);
-    return dumpFile;
+    return new File(path);
   }
 
   public static boolean dumpExist() {
@@ -60,7 +56,7 @@ public class DebugDataSource extends DataSource {
     return dumpFile.exists();
   }
 
-  public static DebugDataSource initNewDump(Context c) throws IOException {
+  public static DebugDataSource initNewDump(Context c) {
     PackageInfo info;
     Dump dump = new Dump();
     try {
@@ -69,7 +65,7 @@ public class DebugDataSource extends DataSource {
       throw new RuntimeException(e);
     }
     dump.version = info.versionName;
-    dump.versionInt = info.versionCode;
+    dump.versionInt = (int) info.getLongVersionCode();
 
     DefaultDataSource delegate = new DefaultDataSource();
     dump.isDeviceRooted = delegate.isDeviceRooted();
@@ -103,7 +99,7 @@ public class DebugDataSource extends DataSource {
         dump.appInfo[i++] = proto;
       }
     }
-    List<PkgInfo> result = new ArrayList<PkgInfo>();
+    List<PkgInfo> result = new ArrayList<>();
 
     for (int i = 0; i < dump.appInfo.length; i++) {
       result.add(new AppInfoProtoImpl(dump.appInfo[i], dump.androidVersion));
@@ -129,18 +125,15 @@ public class DebugDataSource extends DataSource {
     }
 
     delegate.getPackageSizeInfo(
-        pkgInfo, getPackageSizeInfo, pm, new AppStatsCallback() {
-          @Override
-          public void onGetStatsCompleted(AppStats appStats, boolean succeeded) {
-            AppStatsProto stats = AppStatsProtoImpl.makeProto(
-                appStats, succeeded, dump.androidVersion);
-            proto.stats = stats;
-            callback.onGetStatsCompleted(
-                stats.hasAppStats ? new AppStatsProtoImpl(
-                    stats, dump.androidVersion) : null,
-                    stats.succeeded);
-            stats.callbackChildFinished = true;
-          }
+        pkgInfo, getPackageSizeInfo, pm, (appStats, succeeded) -> {
+          AppStatsProto stats = AppStatsProtoImpl.makeProto(
+              appStats, succeeded, dump.androidVersion);
+          proto.stats = stats;
+          callback.onGetStatsCompleted(
+              stats.hasAppStats ? new AppStatsProtoImpl(
+                  stats, dump.androidVersion) : null,
+                  stats.succeeded);
+          stats.callbackChildFinished = true;
         });
   }
 
@@ -151,7 +144,7 @@ public class DebugDataSource extends DataSource {
       if (dump.statFs[i] == null) {
         emptyPos = i;
       } else if (mountPoint.equals(dump.statFs[i].mountPoint)) {
-        return new StatFsSourceProtoImpl(dump.statFs[i], dump.androidVersion);
+        return new StatFsSourceProtoImpl(dump.statFs[i]);
       }
     }
     if (emptyPos == -1) {
@@ -161,8 +154,8 @@ public class DebugDataSource extends DataSource {
       emptyPos = old.length;
     }
     StatFsProto proto = dump.statFs[emptyPos] = StatFsSourceProtoImpl.makeProto(
-            mountPoint, delegate.statFs(mountPoint), dump.androidVersion);
-    return new StatFsSourceProtoImpl(proto, dump.androidVersion);
+            mountPoint, delegate.statFs(mountPoint));
+    return new StatFsSourceProtoImpl(proto);
   }
 
   @TargetApi(Build.VERSION_CODES.FROYO)
@@ -239,12 +232,7 @@ public class DebugDataSource extends DataSource {
     proto.path = path;
     proto.rootRequired = rootRequired;
     return PortableStreamProtoWriterImpl.create(
-        delegate.createNativeScanner(context, path, rootRequired), new CloseCallback() {
-          @Override
-          public void onClose(PortableStreamProto stream) {
-            proto.stream = stream;
-          }
-        });
+        delegate.createNativeScanner(context, path, rootRequired), stream -> proto.stream = stream);
   }
 
   @Override
@@ -259,12 +247,7 @@ public class DebugDataSource extends DataSource {
     }
 
 
-    return PortableStreamProtoWriterImpl.create(delegate.getProc(), new CloseCallback() {
-      @Override
-      public void onClose(PortableStreamProto proto) {
-        dump.proc = proto;
-      }
-    });
+    return PortableStreamProtoWriterImpl.create(delegate.getProc(), proto -> dump.proc = proto);
   }
 
   @Override

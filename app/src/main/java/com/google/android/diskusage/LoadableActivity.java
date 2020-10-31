@@ -19,15 +19,8 @@
 
 package com.google.android.diskusage;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -37,6 +30,10 @@ import com.google.android.diskusage.DiskUsage.AfterLoad;
 import com.google.android.diskusage.entity.FileSystemEntry;
 import com.google.android.diskusage.entity.FileSystemPackage;
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 public abstract class LoadableActivity extends Activity {
   FileSystemPackage pkg_removed;
@@ -51,14 +48,14 @@ public abstract class LoadableActivity extends Activity {
 
   abstract FileSystemSuperRoot scan() throws IOException, InterruptedException;
 
-  class PersistantActivityState {
+  static class PersistantActivityState {
     FileSystemSuperRoot root;
     AfterLoad afterLoad;
     MyProgressDialog loading;
-  };
+  }
 
-  private static Map<String, PersistantActivityState> persistantActivityState =
-    new TreeMap<String, PersistantActivityState>();
+    private static final Map<String, PersistantActivityState> persistantActivityState =
+            new TreeMap<>();
 
   public static void resetStoredStates() {
     persistantActivityState.clear();
@@ -89,7 +86,7 @@ public abstract class LoadableActivity extends Activity {
 
   void LoadFiles(final LoadableActivity activity,
       final AfterLoad runAfterLoad, boolean force) {
-    boolean scanRunning = false;
+    boolean scanRunning;
     final PersistantActivityState state = getPersistantState();
     Log.d("diskusage", "LoadFiles, afterLoad = " + runAfterLoad);
 
@@ -108,12 +105,9 @@ public abstract class LoadableActivity extends Activity {
     state.loading = new MyProgressDialog(activity);
 
     final MyProgressDialog thisLoading = state.loading;
-    state.loading.setOnCancelListener(new OnCancelListener() {
-      @Override
-      public void onCancel(DialogInterface dialog) {
-        state.loading = null;
-        activity.finish();
-      }
+    state.loading.setOnCancelListener(dialog -> {
+      state.loading = null;
+      activity.finish();
     });
     thisLoading.setCancelable(true);
 //    thisLoading.setIndeterminate(true);
@@ -124,87 +118,68 @@ public abstract class LoadableActivity extends Activity {
     if (scanRunning) return;
     final Handler handler = new Handler();
 
-    new Thread() {
-      @Override
-      public void run() {
-        String error;
-        try {
-          Log.d("diskusage", "running scan for " + getKey());
-          final FileSystemSuperRoot newRoot = scan();
+    new Thread(() -> {
+      String error;
+      try {
+        Log.d("diskusage", "running scan for " + getKey());
+        final FileSystemSuperRoot newRoot = scan();
 
-          handler.post(new Runnable() {
-            public void run() {
-              if (state.loading == null) {
-                Log.d("diskusage", "no dialog, doesn't run afterLoad");
-                state.afterLoad = null;
-                if (newRoot.children[0].children != null) {
-                  Log.d("diskusage", "no dialog, updating root still");
-                  state.root = newRoot;
-                }
-                return;
-              }
-              if (state.loading.isShowing()) state.loading.dismiss();
-              state.loading = null;
-              AfterLoad afterLoadCopy = state.afterLoad;
-              state.afterLoad = null;
-              Log.d("diskusage", "dismissed dialog");
-
-              if (newRoot.children[0].children == null) {
-                Log.d("diskusage", "empty card");
-                handleEmptySDCard(activity, runAfterLoad);
-                return;
-              }
+        handler.post(() -> {
+          if (state.loading == null) {
+            Log.d("diskusage", "no dialog, doesn't run afterLoad");
+            state.afterLoad = null;
+            if (newRoot.children[0].children != null) {
+              Log.d("diskusage", "no dialog, updating root still");
               state.root = newRoot;
-              pkg_removed = null;
-              Log.d("diskusage", "run afterLoad = " + afterLoadCopy);
-              afterLoadCopy.run(state.root, false);
             }
-          });
-          return;
-        } catch (final OutOfMemoryError e) {
-          state.root = null;
+            return;
+          }
+          if (state.loading.isShowing()) state.loading.dismiss();
+          state.loading = null;
+          AfterLoad afterLoadCopy = state.afterLoad;
           state.afterLoad = null;
-          Log.d("DiskUsage", "out of memory!");
-          handler.post(new Runnable() {
-            public void run() {
-              if (state.loading == null) return;
-              state.loading.dismiss();
-              handleOutOfMemory(activity);
-            }
-          });
-          return;
-        } catch (InterruptedException e) {
-          error = e.getClass().getName() + ":" + e.getMessage();
-          Log.e("diskusage", "native error", e);
-        } catch (IOException e) {
-          error = e.getClass().getName() + ":" + e.getMessage();
-          Log.e("diskusage", "native error", e);
-        } catch (final RuntimeException e) {
-          error = e.getClass().getName() + ":" + e.getMessage();
-          Log.e("diskusage", "native error", e);
-        } catch (final StackOverflowError e) {
-          error = "Filesystem is damaged.";
-        }
-        final String finalError = error;
+          Log.d("diskusage", "dismissed dialog");
+
+          if (newRoot.children[0].children == null) {
+            Log.d("diskusage", "empty card");
+            handleEmptySDCard(activity, runAfterLoad);
+            return;
+          }
+          state.root = newRoot;
+          pkg_removed = null;
+          Log.d("diskusage", "run afterLoad = " + afterLoadCopy);
+          afterLoadCopy.run(state.root, false);
+        });
+        return;
+      } catch (final OutOfMemoryError e) {
         state.root = null;
         state.afterLoad = null;
-        Log.d("DiskUsage", "exception in scan!");
-        handler.post(new Runnable() {
-          public void run() {
-            if (state.loading == null) return;
-            state.loading.dismiss();
-            new AlertDialog.Builder(activity)
-            .setTitle(finalError)
-            .setOnCancelListener(new OnCancelListener() {
-              public void onCancel(DialogInterface dialog) {
-                activity.finish();
-              }
-            }).create().show();
-
-          }
+        Log.d("DiskUsage", "out of memory!");
+        handler.post(() -> {
+          if (state.loading == null) return;
+          state.loading.dismiss();
+          handleOutOfMemory(activity);
         });
+        return;
+      } catch (InterruptedException | IOException | RuntimeException e) {
+        error = e.getClass().getName() + ":" + e.getMessage();
+        Log.e("diskusage", "native error", e);
+      } catch (final StackOverflowError e) {
+        error = "Filesystem is damaged.";
       }
-    }.start();
+      final String finalError = error;
+      state.root = null;
+      state.afterLoad = null;
+      Log.d("DiskUsage", "exception in scan!");
+      handler.post(() -> {
+        if (state.loading == null) return;
+        state.loading.dismiss();
+        new AlertDialog.Builder(activity)
+        .setTitle(finalError)
+        .setOnCancelListener(dialog -> activity.finish()).create().show();
+
+      });
+    }).start();
   }
 
   @Override
@@ -222,18 +197,12 @@ public abstract class LoadableActivity extends Activity {
       final AfterLoad afterLoad) {
     new AlertDialog.Builder(activity)
     .setTitle(activity.getString(R.string.empty_or_missing_sdcard))
-    .setPositiveButton(activity.getString(R.string.button_rescan), new OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        if (afterLoad == null)
-          throw new RuntimeException("afterLoad is empty");
-        LoadFiles(activity, afterLoad, true);
-      }
+    .setPositiveButton(activity.getString(R.string.button_rescan), (dialog, which) -> {
+      if (afterLoad == null)
+        throw new RuntimeException("afterLoad is empty");
+      LoadFiles(activity, afterLoad, true);
     })
-    .setOnCancelListener(new OnCancelListener() {
-      public void onCancel(DialogInterface dialog) {
-        activity.finish();
-      }
-    }).create().show();
+    .setOnCancelListener(dialog -> activity.finish()).create().show();
   }
 
   private static void handleOutOfMemory(final Activity activity) {
@@ -241,11 +210,7 @@ public abstract class LoadableActivity extends Activity {
       // Can fail if the main window is already closed.
       new AlertDialog.Builder(activity)
       .setTitle(activity.getString(R.string.out_of_memory))
-      .setOnCancelListener(new OnCancelListener() {
-        public void onCancel(DialogInterface dialog) {
-          activity.finish();
-        }
-      }).create().show();
+      .setOnCancelListener(dialog -> activity.finish()).create().show();
     } catch (Throwable t) {
       Toast.makeText(
           activity, "DiskUsage is out of memory. Sorry.", Toast.LENGTH_SHORT).show();

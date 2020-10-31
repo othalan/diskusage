@@ -47,8 +47,8 @@ public final class NativeScanProto extends
     if (!this.path.equals("")) {
       output.writeString(1, this.path);
     }
-    if (this.rootRequired != false) {
-      output.writeBool(2, this.rootRequired);
+    if (this.rootRequired) {
+      output.writeBool(2, true);
     }
     if (this.stream != null) {
       output.writeMessage(3, this.stream);
@@ -63,9 +63,9 @@ public final class NativeScanProto extends
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
           .computeStringSize(1, this.path);
     }
-    if (this.rootRequired != false) {
+    if (this.rootRequired) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(2, this.rootRequired);
+          .computeBoolSize(2, true);
     }
     if (this.stream != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano

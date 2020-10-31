@@ -43,8 +43,8 @@ public final class PortableResultProto extends
     if (this.exception != null) {
       output.writeMessage(1, this.exception);
     }
-    if (this.evaluated != false) {
-      output.writeBool(2, this.evaluated);
+    if (this.evaluated) {
+      output.writeBool(2, true);
     }
     super.writeTo(output);
   }
@@ -56,9 +56,9 @@ public final class PortableResultProto extends
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
         .computeMessageSize(1, this.exception);
     }
-    if (this.evaluated != false) {
+    if (this.evaluated) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-          .computeBoolSize(2, this.evaluated);
+          .computeBoolSize(2, true);
     }
     return size;
   }

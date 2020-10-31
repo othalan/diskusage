@@ -1,10 +1,10 @@
 package com.google.android.diskusage.datasource.debug;
 
+import com.google.android.diskusage.proto.PortableStreamProto;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.google.android.diskusage.proto.PortableStreamProto;
 
 public class PortableStreamProtoReaderImpl extends InputStream {
   private final PortableStreamProto proto;

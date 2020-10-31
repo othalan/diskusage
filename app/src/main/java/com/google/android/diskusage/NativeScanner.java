@@ -19,11 +19,6 @@
 
 package com.google.android.diskusage;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -33,9 +28,15 @@ import com.google.android.diskusage.entity.FileSystemEntry;
 import com.google.android.diskusage.entity.FileSystemEntrySmall;
 import com.google.android.diskusage.entity.FileSystemFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+
 public class NativeScanner implements ProgressGenerator {
-  private final int blockSize;
-  private final int blockSizeIn512Bytes;
+  private final long blockSize;
+  private final long blockSizeIn512Bytes;
   private final long sizeThreshold;
 
   private FileSystemEntry createdNode;
@@ -44,11 +45,10 @@ public class NativeScanner implements ProgressGenerator {
   private int createdNodeNumDirs;
 
   private int heapSize;
-  private final int maxHeapSize;
-  private final PriorityQueue<SmallList> smallLists = new PriorityQueue<SmallList>();
+  private final long maxHeapSize;
+  private final PriorityQueue<SmallList> smallLists = new PriorityQueue<>();
   long pos;
   FileSystemEntry lastCreatedFile;
-  private volatile int deepDepth = 0;
 
   public FileSystemEntry lastCreatedFile() {
     return lastCreatedFile;
@@ -72,9 +72,9 @@ public class NativeScanner implements ProgressGenerator {
 
     @Override
     public int compareTo(SmallList that) {
-      return spaceEfficiency < that.spaceEfficiency ? -1 : (spaceEfficiency == that.spaceEfficiency ? 0 : 1);
+      return Float.compare(spaceEfficiency, that.spaceEfficiency);
     }
-  };
+  }
 
   private InputStream is;
   private final Context context;
@@ -132,7 +132,7 @@ public class NativeScanner implements ProgressGenerator {
     while (true) {
       for (int i = startPos; i < allocated; i++) {
         if (buffer[i] == 0) {
-          String res = new String(buffer, offset, i - offset, "UTF-8");
+          String res = new String(buffer, offset, i - offset, StandardCharsets.UTF_8);
           offset = i + 1;
 //          Log.d("diskusage", "string = " + res);
           return res;
@@ -148,7 +148,7 @@ public class NativeScanner implements ProgressGenerator {
     NONE,
     DIR,
     FILE
-  };
+  }
 
   public Type getType() throws IOException {
     int c = getByte();
@@ -161,7 +161,7 @@ public class NativeScanner implements ProgressGenerator {
     }
   }
 
-  NativeScanner(Context context, int blockSize, long allocatedBlocks, int maxHeap) {
+  NativeScanner(Context context, long blockSize, long allocatedBlocks, long maxHeap) {
     this.blockSize = blockSize;
     this.blockSizeIn512Bytes = blockSize / 512;
     this.sizeThreshold = (allocatedBlocks << FileSystemEntry.blockOffset) / (maxHeap / 2);
@@ -175,10 +175,10 @@ public class NativeScanner implements ProgressGenerator {
   }
 
   private void print(String msg, SmallList list) {
-    String hidden_path = "";
+    StringBuilder hidden_path = new StringBuilder();
     // FIXME: this is debug
     for(FileSystemEntry p = list.parent; p != null; p = p.parent) {
-      hidden_path = p.name + "/" + hidden_path;
+      hidden_path.insert(0, p.name + "/");
     }
     Log.d("diskusage", msg + " " + hidden_path + " = " + list.heapSize + " " + list.spaceEfficiency);
   }
@@ -223,10 +223,10 @@ public class NativeScanner implements ProgressGenerator {
 
 
   private static class SoftStack {
-    private static enum State {
+    private enum State {
       PRE_LOOP,
       LOOP,
-      POST_LOOP;
+      POST_LOOP
     }
     State state;
 
@@ -267,7 +267,6 @@ public class NativeScanner implements ProgressGenerator {
     restart: while(true) {
       switch (s.state) {
       case PRE_LOOP:
-        deepDepth = s.depth;
         s.dirBlockSize = getLong() / blockSizeIn512Bytes;
         /*long dirBytesSize =*/ getLong();  // side-effects
         makeNode(s.parent, s.name);
@@ -285,9 +284,8 @@ public class NativeScanner implements ProgressGenerator {
         s.thisNodeNumDirsSmall = 0;
         s.smallBlocks = 0;
 
-        s.children = new ArrayList<FileSystemEntry>();
-        s.smallChildren = new ArrayList<FileSystemEntry>();
-
+        s.children = new ArrayList<>();
+        s.smallChildren = new ArrayList<>();
 
         s.blocks = 0;
 
@@ -307,7 +305,7 @@ public class NativeScanner implements ProgressGenerator {
             long childBlocks = getLong() / blockSizeIn512Bytes;
             long childBytes = getLong();
             if (childBlocks == 0) continue;
-            createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks, blockSize);
+            createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks);
             pos += createdNode.getSizeInBlocks();
             lastCreatedFile = createdNode;
             //Log.d("diskusage", createdNode.path2());
@@ -353,7 +351,7 @@ public class NativeScanner implements ProgressGenerator {
           s.children.addAll(s.smallChildren);
           s.thisNodeSize += s.thisNodeSizeSmall;
         } else {
-          String msg = null;
+          String msg;
           if (s.thisNodeNumDirsSmall == 0) {
             msg = String.format("<%d files>", s.thisNodeNumFilesSmall);
           } else if (s.thisNodeNumFilesSmall == 0) {
@@ -428,7 +426,7 @@ public class NativeScanner implements ProgressGenerator {
    * is calculated as a sum of all children.
    * @param parent parent directory object.
    * @param depth current directory tree depth
-   * @throws IOException
+   * @throws IOException no dir
    */
   private void scanDirectory(FileSystemEntry parent, String name,
                              int depth) throws IOException {
@@ -452,8 +450,8 @@ public class NativeScanner implements ProgressGenerator {
     int thisNodeNumDirsSmall = 0;
     long smallBlocks = 0;
 
-    ArrayList<FileSystemEntry> children = new ArrayList<FileSystemEntry>();
-    ArrayList<FileSystemEntry> smallChildren = new ArrayList<FileSystemEntry>();
+    ArrayList<FileSystemEntry> children = new ArrayList<>();
+    ArrayList<FileSystemEntry> smallChildren = new ArrayList<>();
 
 
     long blocks = 0;
@@ -471,7 +469,7 @@ public class NativeScanner implements ProgressGenerator {
         long childBlocks = getLong() / blockSizeIn512Bytes;
         long childBytes = getLong();
         if (childBlocks == 0) continue;
-        createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks, blockSize);
+        createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks);
         pos += createdNode.getSizeInBlocks();
         lastCreatedFile = createdNode;
 //        Log.d("diskusage", createdNode.path2());
@@ -510,7 +508,7 @@ public class NativeScanner implements ProgressGenerator {
       children.addAll(smallChildren);
       thisNodeSize += thisNodeSizeSmall;
     } else {
-      String msg = null;
+      String msg;
       if (thisNodeNumDirsSmall == 0) {
         msg = String.format("<%d files>", thisNodeNumFilesSmall);
       } else if (thisNodeNumFilesSmall == 0) {

@@ -76,9 +76,9 @@ public class SelectActivity extends Activity {
       }
       startActivityForResult(i, 0);
     }
-  };
+  }
 
-  private class DiskUsageAction extends AbstractUsageAction {
+    private class DiskUsageAction extends AbstractUsageAction {
     private final MountPoint mountPoint;
 
     DiskUsageAction(MountPoint mountPoint) {
@@ -88,9 +88,9 @@ public class SelectActivity extends Activity {
     public void run() {
       runAction(mountPoint.getKey(), PermissionRequestActivity.class);
     }
-  };
+  }
 
-  private class ShowHideAction implements Runnable {
+    private class ShowHideAction implements Runnable {
     public void run() {
       Intent i = new Intent(SelectActivity.this, ShowHideMountPointsActivity.class);
       startActivity(i);

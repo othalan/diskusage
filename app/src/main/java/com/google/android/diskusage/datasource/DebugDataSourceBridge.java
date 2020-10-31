@@ -1,8 +1,8 @@
 package com.google.android.diskusage.datasource;
 
-import java.io.IOException;
-
 import android.content.Context;
+
+import java.io.IOException;
 
 public interface DebugDataSourceBridge {
   DataSource initNewDump(Context context) throws IOException;
