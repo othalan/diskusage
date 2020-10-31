@@ -6,6 +6,7 @@ import com.google.android.diskusage.datasource.AppStats;
 import com.google.android.diskusage.proto.AppStatsProto;
 
 class AppStatsProtoImpl implements AppStats {
+
   private final AppStatsProto proto;
   private final int androidVersion;
 

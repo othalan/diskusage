@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage.entity;
@@ -39,11 +36,12 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class FileSystemEntry {
+
   private static final Paint bg = new Paint();
   private static final Paint bg_emptySpace = new Paint();
   private static final Paint cursor_fg = new Paint();
   private static final Paint fg_rect = new Paint();
-//  private static final Paint fg_rect = new Paint();
+  //  private static final Paint fg_rect = new Paint();
   public static final Paint fg2 = new Paint();
   private static final Paint fill_bg = new Paint();
   private static final Paint textPaintFolder = new Paint();
@@ -102,7 +100,6 @@ public class FileSystemEntry {
 
   // Object Fields:
 
-
   // The size suitable for painting without any operations (and sorting)
   // Bit layout:
   // 40 bits      | 24 bits
@@ -136,10 +133,10 @@ public class FileSystemEntry {
   public FileSystemEntry parent;
   public FileSystemEntry[] children;
   public String name;
-//  public String sizeString;
+  //  public String sizeString;
   public DrawingCache drawingCache;
 
-  private static final int MULTIPLIER_SHIFT=18;
+  private static final int MULTIPLIER_SHIFT = 18;
 
   private static final int MULTIPLIER_MASK = 7 << MULTIPLIER_SHIFT;
   private static final int MULTIPLIER_BYTES = 0;
@@ -152,7 +149,7 @@ public class FileSystemEntry {
   private static final int MULTIPLIER_GBYTES100 = 7 << MULTIPLIER_SHIFT;
   private static final int SIZE_MASK = (1 << MULTIPLIER_SHIFT) - 1;
 
-//  static int blockSize;
+  //  static int blockSize;
   // will take for a while to make this break
   // 16Mb block size on mobile device... probably in year 2020.
   // probably 32 bits for maximum number of block will break before ~2016
@@ -168,16 +165,24 @@ public class FileSystemEntry {
   }
 
   public static String calcSizeStringFromEncoded(long encodedSize) {
-    int size = SIZE_MASK & (int)encodedSize;
-    switch (MULTIPLIER_MASK & (int)encodedSize) {
-    case MULTIPLIER_BYTES: return String.format(n_bytes, size);
-    case MULTIPLIER_KBYTES: return String.format(n_kilobytes, size);
-    case MULTIPLIER_MBYTES: return String.format(n_megabytes, size * (1f / 1024));
-    case MULTIPLIER_MBYTES10: return String.format(n_megabytes10, size * (1f / 1024));
-    case MULTIPLIER_MBYTES100: return String.format(n_megabytes100, size);
-    case MULTIPLIER_GBYTES: return String.format(n_gigabytes, size * (1f / 1024));
-    case MULTIPLIER_GBYTES10: return String.format(n_gigabytes10, size * (1f / 1024));
-    case MULTIPLIER_GBYTES100: return String.format(n_gigabytes100, size);
+    int size = SIZE_MASK & (int) encodedSize;
+    switch (MULTIPLIER_MASK & (int) encodedSize) {
+      case MULTIPLIER_BYTES:
+        return String.format(n_bytes, size);
+      case MULTIPLIER_KBYTES:
+        return String.format(n_kilobytes, size);
+      case MULTIPLIER_MBYTES:
+        return String.format(n_megabytes, size * (1f / 1024));
+      case MULTIPLIER_MBYTES10:
+        return String.format(n_megabytes10, size * (1f / 1024));
+      case MULTIPLIER_MBYTES100:
+        return String.format(n_megabytes100, size);
+      case MULTIPLIER_GBYTES:
+        return String.format(n_gigabytes, size * (1f / 1024));
+      case MULTIPLIER_GBYTES10:
+        return String.format(n_gigabytes10, size * (1f / 1024));
+      case MULTIPLIER_GBYTES100:
+        return String.format(n_gigabytes100, size);
     }
     return "";
   }
@@ -189,13 +194,27 @@ public class FileSystemEntry {
   }
 
   private long makeBytesPart(long size) {
-    if (size < 1024) return size;
-    if (size < 1024 * 1024) return MULTIPLIER_KBYTES | (size >> 10);
-    if (size < 1024 * 1024 * 10 ) return MULTIPLIER_MBYTES | (size >> 10);
-    if (size < 1024 * 1024 * 200) return MULTIPLIER_MBYTES10 | (size >> 10);
-    if (size < (long) 1024 * 1024 * 1024) return MULTIPLIER_MBYTES100 | (size >> 20);
-    if (size < (long) 1024 * 1024 * 1024 * 10) return MULTIPLIER_GBYTES | (size >> 20);
-    if (size < (long) 1024 * 1024 * 1024 * 200) return MULTIPLIER_GBYTES10 | (size >> 20);
+    if (size < 1024) {
+      return size;
+    }
+    if (size < 1024 * 1024) {
+      return MULTIPLIER_KBYTES | (size >> 10);
+    }
+    if (size < 1024 * 1024 * 10) {
+      return MULTIPLIER_MBYTES | (size >> 10);
+    }
+    if (size < 1024 * 1024 * 200) {
+      return MULTIPLIER_MBYTES10 | (size >> 10);
+    }
+    if (size < (long) 1024 * 1024 * 1024) {
+      return MULTIPLIER_MBYTES100 | (size >> 20);
+    }
+    if (size < (long) 1024 * 1024 * 1024 * 10) {
+      return MULTIPLIER_GBYTES | (size >> 20);
+    }
+    if (size < (long) 1024 * 1024 * 1024 * 200) {
+      return MULTIPLIER_GBYTES10 | (size >> 20);
+    }
     return MULTIPLIER_GBYTES100 | (size >> 30);
   }
 
@@ -222,7 +241,9 @@ public class FileSystemEntry {
   public FileSystemEntry setChildren(FileSystemEntry[] children, long blockSize) {
     this.children = children;
     long blocks = 0;
-    if (children == null) return this;
+    if (children == null) {
+      return this;
+    }
     for (FileSystemEntry child : children) {
       blocks += child.getSizeInBlocks();
       child.parent = this;
@@ -233,6 +254,7 @@ public class FileSystemEntry {
 
 
   public static class ExcludeFilter {
+
     public final Map<String, ExcludeFilter> childFilter;
 
     private static void addEntry(
@@ -251,8 +273,8 @@ public class FileSystemEntry {
         return;
       }
       TreeMap<String, ArrayList<String>> filter =
-              new TreeMap<>();
-      for(String path : exclude_paths) {
+          new TreeMap<>();
+      for (String path : exclude_paths) {
         String[] parts = path.split("/", 2);
         if (parts.length < 2) {
           addEntry(filter, path, null);
@@ -290,6 +312,7 @@ public class FileSystemEntry {
   }
 
   public static class Compare implements Comparator<FileSystemEntry> {
+
     @Override
     public final int compare(FileSystemEntry aa, FileSystemEntry bb) {
       if (aa.encodedSize == bb.encodedSize) {
@@ -309,11 +332,14 @@ public class FileSystemEntry {
   }
 
   public class SearchInterruptedException extends RuntimeException {
+
     private static final long serialVersionUID = -3986013022885904101L;
   }
 
   public FileSystemEntry copy() {
-    if (Thread.interrupted()) throw new SearchInterruptedException();
+    if (Thread.interrupted()) {
+      throw new SearchInterruptedException();
+    }
     FileSystemEntry copy = create();
     if (this.children != null) {
       FileSystemEntry[] children = new FileSystemEntry[this.children.length];
@@ -330,7 +356,9 @@ public class FileSystemEntry {
   public FileSystemEntry filterChildren(CharSequence pattern, long blockSize) {
 //    res = Pattern.compile(Pattern.quote(pattern.toString()), Pattern.CASE_INSENSITIVE).matcher(name).find();
 
-    if (children == null) return null;
+    if (children == null) {
+      return null;
+    }
     ArrayList<FileSystemEntry> filtered_children = new ArrayList<>();
 
     for (FileSystemEntry child : this.children) {
@@ -339,14 +367,15 @@ public class FileSystemEntry {
         filtered_children.add(childCopy);
       }
     }
-    if (filtered_children.size() == 0) return null;
+    if (filtered_children.size() == 0) {
+      return null;
+    }
     FileSystemEntry[] children = new FileSystemEntry[filtered_children.size()];
     filtered_children.toArray(children);
     Arrays.sort(children, COMPARE);
     FileSystemEntry copy = create();
     copy.children = children;
     long size = 0;
-
 
     for (FileSystemEntry child : children) {
       size += child.getSizeInBlocks();
@@ -374,7 +403,9 @@ public class FileSystemEntry {
     int i;
 
     for (i = 0; i < len; i++) {
-      if (children0[i] == directChild) return i;
+      if (children0[i] == directChild) {
+        return i;
+      }
     }
 
     throw new RuntimeException("something broken");
@@ -386,7 +417,9 @@ public class FileSystemEntry {
    */
   public final FileSystemEntry getNext() {
     int index = parent.getIndexOf(this);
-    if (index + 1 == parent.children.length) return this;
+    if (index + 1 == parent.children.length) {
+      return this;
+    }
     return parent.children[index + 1];
   }
 
@@ -396,12 +429,16 @@ public class FileSystemEntry {
    */
   public final FileSystemEntry getPrev() {
     int index = parent.getIndexOf(this);
-    if (index == 0) return this;
+    if (index == 0) {
+      return this;
+    }
     return parent.children[index - 1];
   }
 
   private DrawingCache getDrawingCache() {
-    if (drawingCache != null) return drawingCache;
+    if (drawingCache != null) {
+      return drawingCache;
+    }
     DrawingCache drawingCache = new DrawingCache(this);
     this.drawingCache = drawingCache;
     return drawingCache;
@@ -472,42 +509,42 @@ public class FileSystemEntry {
         float fontSize0 = fontSize;
 
         // FIXME: bg_emptySpace
-          rt.specialSquare.draw(xoffset, top, child_xoffset, bottom);
+        rt.specialSquare.draw(xoffset, top, child_xoffset, bottom);
 
-          if (bottom - top > fontSize0 * 2) {
-            float pos = (top + bottom) * 0.5f;
-            if (pos < fontSize0) {
-              if (bottom > 2 * fontSize0) {
-                pos = fontSize0;
-              } else {
-                pos = bottom - fontSize0;
-              }
-            } else if (pos > (float) screenHeight - fontSize0) {
-              if (top < (float) screenHeight - 2 * fontSize0) {
-                pos = (float) screenHeight - fontSize0;
-              } else {
-                pos = top + fontSize0;
-              }
+        if (bottom - top > fontSize0 * 2) {
+          float pos = (top + bottom) * 0.5f;
+          if (pos < fontSize0) {
+            if (bottom > 2 * fontSize0) {
+              pos = fontSize0;
+            } else {
+              pos = bottom - fontSize0;
             }
-            float pos1 = pos - descent;
-            float pos2 = pos - ascent;
+          } else if (pos > (float) screenHeight - fontSize0) {
+            if (top < (float) screenHeight - 2 * fontSize0) {
+              pos = (float) screenHeight - fontSize0;
+            } else {
+              pos = top + fontSize0;
+            }
+          }
+          float pos1 = pos - descent;
+          float pos2 = pos - ascent;
 
-            DrawingCache cache = c.getDrawingCache();
+          DrawingCache cache = c.getDrawingCache();
 //            String sizeString = cache.getSizeString();
 //            int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
 //            String clippedName = c.name.substring(0, cliplen);
 //            canvas.drawText(clippedName,  xoffset + 2, pos1, fg);
 //            canvas.drawText(sizeString, xoffset + 2, pos2, fg);
-            cache.drawText(rt, xoffset + 2, pos1, elementWidth - 5);
-            cache.drawSize(rt, xoffset + 2, pos2, elementWidth - 5);
+          cache.drawText(rt, xoffset + 2, pos1, elementWidth - 5);
+          cache.drawSize(rt, xoffset + 2, pos2, elementWidth - 5);
 
-          } else if (bottom - top > fontSize0) {
+        } else if (bottom - top > fontSize0) {
 //            int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
 //            String clippedName = c.name.substring(0, cliplen);
 //            canvas.drawText(clippedName, xoffset + 2, (top + bottom - ascent - descent) / 2, c.children == null ? fg2 : fg);
-            DrawingCache cache = c.getDrawingCache();
-            cache.drawText(rt, xoffset + 2, (top + bottom - ascent - descent) / 2, elementWidth - 5);
-          }
+          DrawingCache cache = c.getDrawingCache();
+          cache.drawText(rt, xoffset + 2, (top + bottom - ascent - descent) / 2, elementWidth - 5);
+        }
       }
 
       child_clipTop -= csize;
@@ -578,46 +615,46 @@ public class FileSystemEntry {
       }
 
       if (clipLeft < elementWidth) {
-          // FIXME
-          float windowHeight0 = screenHeight;
-          float fontSize0 = fontSize;
-          float top0 = top;
-          float bottom0 = bottom;
+        // FIXME
+        float windowHeight0 = screenHeight;
+        float fontSize0 = fontSize;
+        float top0 = top;
+        float bottom0 = bottom;
 
-          canvas.drawRect(xoffset, top0, child_xoffset, bottom0, bg_emptySpace);
-          canvas.drawRect(xoffset, top0, child_xoffset, bottom0, fg_rect);
+        canvas.drawRect(xoffset, top0, child_xoffset, bottom0, bg_emptySpace);
+        canvas.drawRect(xoffset, top0, child_xoffset, bottom0, fg_rect);
 
-          if (bottom - top > fontSize0 * 2) {
-            float pos = (top + bottom) * 0.5f;
-            if (pos < fontSize0) {
-              if (bottom > 2 * fontSize0) {
-                pos = fontSize0;
-              } else {
-                pos = bottom - fontSize0;
-              }
-            } else if (pos > windowHeight0 - fontSize0) {
-              if (top < windowHeight0 - 2 * fontSize0) {
-                pos = windowHeight0 - fontSize0;
-              } else {
-                pos = top + fontSize0;
-              }
+        if (bottom - top > fontSize0 * 2) {
+          float pos = (top + bottom) * 0.5f;
+          if (pos < fontSize0) {
+            if (bottom > 2 * fontSize0) {
+              pos = fontSize0;
+            } else {
+              pos = bottom - fontSize0;
             }
-            float pos1 = pos - descent;
-            float pos2 = pos - ascent;
-
-            DrawingCache cache = c.getDrawingCache();
-            String sizeString = cache.getSizeString();
-            int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
-            String clippedName = c.name.substring(0, cliplen);
-            canvas.drawText(clippedName,  xoffset + 2, pos1, textPaintFolder);
-            canvas.drawText(sizeString, xoffset + 2, pos2, textPaintFolder);
-          } else if (bottom - top > fontSize0) {
-            int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
-            String clippedName = c.name.substring(0, cliplen);
-            canvas.drawText(clippedName, xoffset + 2,
-                (top + bottom - ascent - descent) / 2,
-                c.children == null ? textPaintFile : textPaintFolder);
+          } else if (pos > windowHeight0 - fontSize0) {
+            if (top < windowHeight0 - 2 * fontSize0) {
+              pos = windowHeight0 - fontSize0;
+            } else {
+              pos = top + fontSize0;
+            }
           }
+          float pos1 = pos - descent;
+          float pos2 = pos - ascent;
+
+          DrawingCache cache = c.getDrawingCache();
+          String sizeString = cache.getSizeString();
+          int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
+          String clippedName = c.name.substring(0, cliplen);
+          canvas.drawText(clippedName, xoffset + 2, pos1, textPaintFolder);
+          canvas.drawText(sizeString, xoffset + 2, pos2, textPaintFolder);
+        } else if (bottom - top > fontSize0) {
+          int cliplen = fg2.breakText(c.name, true, elementWidth - 4, null);
+          String clippedName = c.name.substring(0, cliplen);
+          canvas.drawText(clippedName, xoffset + 2,
+              (top + bottom - ascent - descent) / 2,
+              c.children == null ? textPaintFile : textPaintFolder);
+        }
       }
 
       child_clipTop -= csize;
@@ -662,10 +699,11 @@ public class FileSystemEntry {
 
       FileSystemEntry[] cchildren = c.children;
 
-      if (cchildren != null)
+      if (cchildren != null) {
         FileSystemEntry.paintGPU(c.getSizeForRendering(), cchildren, rt,
                 child_xoffset, yoffset, yscale,
                 child_clipLeft, child_clipRight, child_clipTop, child_clipBottom, screenHeight);
+      }
 
       if (bottom - top < 4 && deletedEntry != c) {
         bottom += parent_size * yscale;
@@ -758,10 +796,11 @@ public class FileSystemEntry {
 
       FileSystemEntry[] cchildren = c.children;
 
-      if (cchildren != null)
+      if (cchildren != null) {
         FileSystemEntry.paint(c.getSizeForRendering(), cchildren, canvas,
                 child_xoffset, yoffset, yscale,
                 child_clipLeft, child_clipRight, child_clipTop, child_clipBottom, screenHeight);
+      }
 
       if (bottom - top < 4 && deletedEntry != c) {
         bottom += parent_size * yscale;
@@ -837,11 +876,11 @@ public class FileSystemEntry {
     //viewTop = 23 * 1024 * 1024;
     //viewDepth = 0.3f;
 
-    int viewLeft = (int)(viewDepth * elementWidth);
+    int viewLeft = (int) (viewDepth * elementWidth);
 
     // screen clip area to world conversion:
-    long clipTop = (long)(bounds.top / yscale) + viewTop;
-    long clipBottom = (long)(bounds.bottom / yscale) + viewTop;
+    long clipTop = (long) (bounds.top / yscale) + viewTop;
+    long clipBottom = (long) (bounds.bottom / yscale) + viewTop;
     int clipLeft = bounds.left + viewLeft;
     int clipRight = bounds.right + viewLeft;
     float xoffset = -viewLeft;
@@ -862,7 +901,8 @@ public class FileSystemEntry {
     paintGPU(getSizeForRendering(), children, rt, xoffset, yoffset, yscale, clipLeft, clipRight,
         clipTop, clipBottom, screenHeight);
 
-    paintSpecialGPU(getSizeForRendering(), children, rt, xoffset, yoffset, yscale, clipLeft, clipRight,
+    paintSpecialGPU(getSizeForRendering(), children, rt, xoffset, yoffset, yscale, clipLeft,
+        clipRight,
         clipTop, clipBottom, screenHeight, numSpecialEntries);
 
     // paint position
@@ -886,11 +926,11 @@ public class FileSystemEntry {
     //viewTop = 23 * 1024 * 1024;
     //viewDepth = 0.3f;
 
-    int viewLeft = (int)(viewDepth * elementWidth);
+    int viewLeft = (int) (viewDepth * elementWidth);
 
     // screen clip area to world conversion:
-    long clipTop = (long)(bounds.top / yscale) + viewTop;
-    long clipBottom = (long)(bounds.bottom / yscale) + viewTop;
+    long clipTop = (long) (bounds.top / yscale) + viewTop;
+    long clipBottom = (long) (bounds.bottom / yscale) + viewTop;
     int clipLeft = bounds.left + viewLeft;
     int clipRight = bounds.right + viewLeft;
     float xoffset = -viewLeft;
@@ -911,7 +951,8 @@ public class FileSystemEntry {
     paint(getSizeForRendering(), children, canvas, xoffset, yoffset, yscale, clipLeft, clipRight,
         clipTop, clipBottom, screenHeight);
 
-    paintSpecial(getSizeForRendering(), children, canvas, xoffset, yoffset, yscale, clipLeft, clipRight,
+    paintSpecial(getSizeForRendering(), children, canvas, xoffset, yoffset, yscale, clipLeft,
+        clipRight,
         clipTop, clipBottom, screenHeight, numSpecialEntries);
 
     // paint position
@@ -934,17 +975,19 @@ public class FileSystemEntry {
     if (sz < 1024 * 1024 * 10) {
       if (sz < 1024 * 1024) {
         if (sz < 1024) {
-          if (sz < 0) sz = 0;
-          return String.format(n_bytes, (int)sz);
+          if (sz < 0) {
+            sz = 0;
+          }
+          return String.format(n_bytes, (int) sz);
         }
-        return String.format(n_kilobytes, (int)(sz * (1f / 1024)));
+        return String.format(n_kilobytes, (int) (sz * (1f / 1024)));
       }
       return String.format(n_megabytes, sz * (1f / 1024 / 1024));
     }
     if (sz < 1024 * 1024 * 200) {
       return String.format(n_megabytes10, sz * (1f / 1024 / 1024));
     }
-    return String.format(n_megabytes100, (int)(sz * (1f / 1024 / 1024)));
+    return String.format(n_megabytes100, (int) (sz * (1f / 1024 / 1024)));
   }
 
   public final String sizeString() {
@@ -959,9 +1002,9 @@ public class FileSystemEntry {
 
   public final String toTitleString() {
     String sizeString0 = sizeString();
-    if (children != null && children.length != 0)
+    if (children != null && children.length != 0) {
       return String.format(dir_name_size_num_dirs, name, sizeString0, children.length);
-    else if (getSizeInBlocks() == 0) {
+    } else if (getSizeInBlocks() == 0) {
       return String.format(dir_empty, name);
     } else {
       return String.format(dir_name_size, name, sizeString0);
@@ -989,7 +1032,7 @@ public class FileSystemEntry {
 
   public final String absolutePath() {
     if (this instanceof FileSystemRoot) {
-      return ((FileSystemRoot)this).rootPath;
+      return ((FileSystemRoot) this).rootPath;
     }
     return parent.absolutePath() + "/" + name;
   }
@@ -1003,7 +1046,7 @@ public class FileSystemEntry {
     int d = 0;
     FileSystemEntry root = this;
 
-    while(entry != root) {
+    while (entry != root) {
       entry = entry.parent;
       d++;
     }
@@ -1036,7 +1079,9 @@ public class FileSystemEntry {
         // found entry
         entry = e;
         children0 = e.children;
-        if (children0 == null) return entry;
+        if (children0 == null) {
+          return entry;
+        }
         break;
       }
 
@@ -1064,7 +1109,9 @@ public class FileSystemEntry {
       FileSystemEntry[] children = dir.children;
 
       for (FileSystemEntry e : children) {
-        if (e == cursor) break;
+        if (e == cursor) {
+          break;
+        }
         offset += e.getSizeForRendering();
       }
       cursor = dir;
@@ -1077,7 +1124,9 @@ public class FileSystemEntry {
     FileSystemEntry[] children0 = parent.children;
     int len = children0.length;
     for (int i = 0; i < len; i++) {
-      if (children0[i] != this) continue;
+      if (children0[i] != this) {
+        continue;
+      }
 
       // executed only once:
       parent.children = new FileSystemEntry[len - 1];
@@ -1147,7 +1196,9 @@ public class FileSystemEntry {
   public static final int padding = 4;
 
   public static void setupStrings(Context context) {
-    if (n_bytes != null) return;
+    if (n_bytes != null) {
+      return;
+    }
     n_bytes = context.getString(R.string.n_bytes);
     n_kilobytes = context.getString(R.string.n_kilobytes);
     n_megabytes = context.getString(R.string.n_megabytes);
@@ -1164,7 +1215,9 @@ public class FileSystemEntry {
   public static void updateFontsLegacy(Context context) {
     float textSize = context.getResources().getDisplayMetrics().scaledDensity
         * 12 + 0.5f;
-    if (textSize < 10) textSize = 10;
+    if (textSize < 10) {
+      textSize = 10;
+    }
     updateFonts(textSize);
   }
 
@@ -1175,7 +1228,6 @@ public class FileSystemEntry {
     descent = textPaintFolder.descent();
     fontSize = descent - ascent;
   }
-
 
 //  public final void getAllChildren(List<String> out, FileSystemEntry deleteRoot) {
 //    FileSystemEntry[] sortedChildren = new FileSystemEntry[children.length];
@@ -1199,10 +1251,13 @@ public class FileSystemEntry {
   }
 
   private void validateRecursive() {
-    if (children == null) return;
+    if (children == null) {
+      return;
+    }
     for (FileSystemEntry child : children) {
-      if (child.parent != this)
+      if (child.parent != this) {
         throw new RuntimeException("corrupted: " + this.path2() + " <> " + child.name);
+      }
       child.validateRecursive();
     }
   }
@@ -1213,18 +1268,24 @@ public class FileSystemEntry {
    */
   public int getNumFiles() {
     if (this instanceof FileSystemEntrySmall) {
-      return ((FileSystemEntrySmall)this).numFiles;
+      return ((FileSystemEntrySmall) this).numFiles;
     }
 
-    if (children == null) return 1;
+    if (children == null) {
+      return 1;
+    }
 
     int numFiles = 0;
     boolean hasFile = false;
     for (FileSystemEntry entry : children) {
-      if (entry.children == null) hasFile = true;
+      if (entry.children == null) {
+        hasFile = true;
+      }
       numFiles += entry.getNumFiles();
     }
-    if (hasFile) numFiles++;
+    if (hasFile) {
+      numFiles++;
+    }
     return numFiles;
   }
 

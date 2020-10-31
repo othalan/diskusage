@@ -11,8 +11,9 @@ import com.google.android.diskusage.FileSystemState.FileSystemView;
 import com.google.android.diskusage.entity.FileSystemEntry;
 
 public final class FileSystemViewCPU extends View implements FileSystemView {
+
   private final FileSystemState eventHandler;
-  
+
   public FileSystemViewCPU(DiskUsage context,
       FileSystemState eventHandler) {
     super(context);
@@ -30,12 +31,14 @@ public final class FileSystemViewCPU extends View implements FileSystemView {
         eventHandler.multitouchHandler.newMyMotionEvent(ev));
     return true;
   }
-  
+
   public void requestRepaint() {
     invalidate();
   }
+
   public void requestRepaintGPU() {
   }
+
   public void requestRepaint(int l, int t, int r, int b) {
     invalidate();
   }
@@ -44,7 +47,7 @@ public final class FileSystemViewCPU extends View implements FileSystemView {
   protected final void onDraw(final Canvas canvas) {
     eventHandler.onDraw2(canvas);
   }
-  
+
   @Override
   public final boolean onKeyDown(final int keyCode, final KeyEvent event) {
     if (eventHandler.onKeyDown(keyCode, event)) {
@@ -52,16 +55,19 @@ public final class FileSystemViewCPU extends View implements FileSystemView {
     }
     return super.onKeyDown(keyCode, event);
   }
-  
+
   @Override
   protected final void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
     FileSystemEntry.updateFontsLegacy(getContext());
     eventHandler.layout(changed, left, top, right, bottom, getWidth(), getHeight());
   }
-  
-  public void onPause() {}
-  public void onResume() {}
+
+  public void onPause() {
+  }
+
+  public void onResume() {
+  }
 
   @Override
   public void runInRenderThread(Runnable r) {

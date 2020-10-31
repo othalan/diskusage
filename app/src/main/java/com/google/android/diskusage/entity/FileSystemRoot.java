@@ -1,6 +1,7 @@
 package com.google.android.diskusage.entity;
 
 public class FileSystemRoot extends FileSystemEntry {
+
   final String rootPath;
   private final boolean deletable;
 
@@ -9,7 +10,7 @@ public class FileSystemRoot extends FileSystemEntry {
     this.rootPath = rootPath;
     this.deletable = deletable;
   }
-  
+
   public static FileSystemRoot makeNode(String name, String rootPath, boolean deletable) {
     return new FileSystemRoot(name, rootPath, deletable);
   }
@@ -28,17 +29,18 @@ public class FileSystemRoot extends FileSystemEntry {
   public boolean isDeletable() {
     return deletable;
   }
-  
+
   public static String withSlash(String path) {
-    if (path.length() > 0 && path.charAt(path.length() - 1) != '/')
+    if (path.length() > 0 && path.charAt(path.length() - 1) != '/') {
       path += '/';
+    }
     return path;
   }
-  
+
   public final FileSystemEntry getByAbsolutePath(String path) {
     String rootPathWithSlash = withSlash(rootPath);
     String pathWithSlash = withSlash(path);
-    
+
     if (pathWithSlash.equals(rootPathWithSlash)) {
       return getEntryByName(path, true);
     }
@@ -49,7 +51,9 @@ public class FileSystemRoot extends FileSystemEntry {
       if (s instanceof FileSystemRoot) {
         FileSystemRoot subroot = (FileSystemRoot) s;
         FileSystemEntry e = subroot.getByAbsolutePath(path);
-        if (e != null) return e;
+        if (e != null) {
+          return e;
+        }
       }
     }
     return null;

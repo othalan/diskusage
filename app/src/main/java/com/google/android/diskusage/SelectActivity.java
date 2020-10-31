@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -46,11 +43,12 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class SelectActivity extends Activity {
+
   private AlertDialog dialog;
-  Map<String,Bundle> bundles = new TreeMap<String,Bundle>();
+  Map<String, Bundle> bundles = new TreeMap<String, Bundle>();
   ArrayList<Runnable> actionList = new ArrayList<Runnable>();
   private boolean expandRootMountPoints;
-//  private static boolean debugUnhidden = true;
+  //  private static boolean debugUnhidden = true;
   private static boolean debugLoadedDump = false;
   private DataSource debugDataSource;
   private static DebugDataSourceBridge debugDataSourceBridge;
@@ -67,6 +65,7 @@ public class SelectActivity extends Activity {
 
 
   private abstract class AbstractUsageAction implements Runnable {
+
     public void runAction(String key, Class<?> viewer) {
       Intent i = new Intent(SelectActivity.this, viewer);
       i.putExtra(DiskUsage.KEY_KEY, key);
@@ -78,7 +77,8 @@ public class SelectActivity extends Activity {
     }
   }
 
-    private class DiskUsageAction extends AbstractUsageAction {
+  private class DiskUsageAction extends AbstractUsageAction {
+
     private final MountPoint mountPoint;
 
     DiskUsageAction(MountPoint mountPoint) {
@@ -90,7 +90,8 @@ public class SelectActivity extends Activity {
     }
   }
 
-    private class ShowHideAction implements Runnable {
+  private class ShowHideAction implements Runnable {
+
     public void run() {
       Intent i = new Intent(SelectActivity.this, ShowHideMountPointsActivity.class);
       startActivity(i);
@@ -98,6 +99,7 @@ public class SelectActivity extends Activity {
   }
 
   private class EnableDebugAction implements Runnable {
+
     public void run() {
       try {
         debugLoadedDump = false;
@@ -117,19 +119,21 @@ public class SelectActivity extends Activity {
   }
 
   private class DisableDebug implements Runnable {
+
     @Override
     public void run() {
-        DataSource.override(new DefaultDataSource());
-        debugDataSource = null;
+      DataSource.override(new DefaultDataSource());
+      debugDataSource = null;
 //        debugUnhidden = false;
-        dialog.hide();
-        MountPoint.reset();
-        makeDialog();
+      dialog.hide();
+      MountPoint.reset();
+      makeDialog();
     }
 
   }
 
   private class LoadDumpAction implements Runnable {
+
     public void run() {
       try {
         debugDataSource = debugDataSourceBridge.loadDefaultDump();
@@ -149,6 +153,7 @@ public class SelectActivity extends Activity {
   }
 
   private class SendBugReportAction implements Runnable {
+
     @Override
     public void run() {
       try {
@@ -178,10 +183,11 @@ public class SelectActivity extends Activity {
         }
         reader.close();
         if (checksum != RootMountPoint.checksum) {
-            Log.d("diskusage", checksum + " vs " + RootMountPoint.checksum);
+          Log.d("diskusage", checksum + " vs " + RootMountPoint.checksum);
           reload = true;
         }
-      } catch (Throwable t) {}
+      } catch (Throwable t) {
+      }
 
       if (reload) {
         dialog.hide();
@@ -223,12 +229,14 @@ public class SelectActivity extends Activity {
     }
 
     if (DataSource.get().isDeviceRooted()) {
-      SharedPreferences prefs =  getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
+      SharedPreferences prefs = getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
       Map<String, ?> ignoreList = prefs.getAll();
       if (!ignoreList.keySet().isEmpty()) {
         Set<String> ignores = ignoreList.keySet();
         for (MountPoint mountPoint : RootMountPoint.getRootedMountPoints(this)) {
-          if (ignores.contains(mountPoint.getRoot())) continue;
+          if (ignores.contains(mountPoint.getRoot())) {
+            continue;
+          }
           options.add(mountPoint.getRoot());
           actionList.add(new DiskUsageAction(mountPoint));
         }
@@ -257,20 +265,20 @@ public class SelectActivity extends Activity {
     final String[] optionsArray = options.toArray(new String[options.size()]);
 
     dialog = new AlertDialog.Builder(this)
-    .setItems(optionsArray,
-        new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        actionList.get(which).run();
-      }
-    })
-    .setTitle(R.string.ask_view)
-    .setOnCancelListener(new OnCancelListener() {
-      @Override
-      public void onCancel(DialogInterface dialog) {
-        finish();
-      }
-    }).create();
+        .setItems(optionsArray,
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                actionList.get(which).run();
+              }
+            })
+        .setTitle(R.string.ask_view)
+        .setOnCancelListener(new OnCancelListener() {
+          @Override
+          public void onCancel(DialogInterface dialog) {
+            finish();
+          }
+        }).create();
     /*try {
       if (debugDataSourceBridge != null) {
         dialog.getListView().setOnItemLongClickListener(
@@ -311,7 +319,9 @@ public class SelectActivity extends Activity {
 
   @Override
   protected void onPause() {
-    if (dialog.isShowing()) dialog.dismiss();
+    if (dialog.isShowing()) {
+      dialog.dismiss();
+    }
     handler.removeCallbacks(checkForMountsUpdates);
     super.onPause();
   }
@@ -319,7 +329,9 @@ public class SelectActivity extends Activity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    if (data == null) return;
+    if (data == null) {
+      return;
+    }
     Bundle state = data.getBundleExtra(DiskUsage.STATE_KEY);
     String key = data.getStringExtra(DiskUsage.KEY_KEY);
     bundles.put(key, state);

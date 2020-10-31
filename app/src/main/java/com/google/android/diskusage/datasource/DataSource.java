@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public abstract class DataSource {
+
   private static DataSource currentDataSource = new DefaultDataSource();
 
   public static DataSource get() {
@@ -35,6 +36,7 @@ public abstract class DataSource {
 
   @TargetApi(Build.VERSION_CODES.FROYO)
   public abstract PortableFile getExternalFilesDir(Context context);
+
   @TargetApi(Build.VERSION_CODES.KITKAT)
   public abstract PortableFile[] getExternalFilesDirs(Context context);
 

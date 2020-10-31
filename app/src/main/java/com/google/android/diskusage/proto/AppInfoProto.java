@@ -7,6 +7,7 @@ public final class AppInfoProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile AppInfoProto[] _emptyArray;
+
   public static AppInfoProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -147,7 +148,7 @@ public final class AppInfoProto extends
         if (element != null) {
           dataCount++;
           dataSize += com.google.protobuf.nano.CodedOutputByteBufferNano
-                  .computeStringSizeNoTag(element);
+              .computeStringSizeNoTag(element);
         }
       }
       size += dataSize;
@@ -159,14 +160,14 @@ public final class AppInfoProto extends
     }
     if (this.stats != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(10, this.stats);
+          .computeMessageSize(10, this.stats);
     }
     return size;
   }
 
   @Override
   public AppInfoProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -245,7 +246,7 @@ public final class AppInfoProto extends
   }
 
   public static AppInfoProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new AppInfoProto().mergeFrom(input);
   }

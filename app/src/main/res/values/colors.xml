@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<?xml version="1.0" encoding="utf-8"?><!--
  * DiskUsage - displays sdcard usage on android.
  * Copyright (C) 2008 Ivan Volosyuk
  *
@@ -19,6 +18,6 @@
  -->
 
 <resources>
-    <drawable name="transparent">#00000000</drawable>
-    <color name="almost_white">#CFFFFFFF</color>
+  <drawable name="transparent">#00000000</drawable>
+  <color name="almost_white">#CFFFFFFF</color>
 </resources>

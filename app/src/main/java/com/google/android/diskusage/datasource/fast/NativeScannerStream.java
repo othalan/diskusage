@@ -51,6 +51,7 @@ public class NativeScannerStream extends InputStream {
   }
 
   static class Factory {
+
     private final Context context;
 
     Factory(Context context) {
@@ -73,17 +74,16 @@ public class NativeScannerStream extends InputStream {
       boolean deviceIsRooted = DataSource.get().isDeviceRooted();
       Process process = null;
 
-
       if (!(rootRequired && deviceIsRooted)) {
-        process = Runtime.getRuntime().exec(new String[] {
+        process = Runtime.getRuntime().exec(new String[]{
             getScanBinaryPath(binaryName), root});
       } else {
         IOException e = null;
-        for (String su : new String[] { "su", "/system/bin/su", "/system/xbin/su" }) {
+        for (String su : new String[]{"su", "/system/bin/su", "/system/xbin/su"}) {
           try {
-            process = Runtime.getRuntime().exec(new String[] { su });
+            process = Runtime.getRuntime().exec(new String[]{su});
             break;
-          } catch(IOException newe) {
+          } catch (IOException newe) {
             e = newe;
           }
         }
@@ -105,12 +105,14 @@ public class NativeScannerStream extends InputStream {
         throws IOException, InterruptedException {
       // Remove 'scan' binary every run. TODO: do clean update on package update
 //      if (remove) {
-        new File(getScanBinaryPath(binaryName)).delete();
+      new File(getScanBinaryPath(binaryName)).delete();
 //        remove = false;
 //      }
 
       File binary = new File(getScanBinaryPath(binaryName));
-      if (binary.isFile()) return;
+      if (binary.isFile()) {
+        return;
+      }
       unpackScanBinary(binaryName);
       runChmod(binaryName);
     }
@@ -136,7 +138,7 @@ public class NativeScannerStream extends InputStream {
         try {
           process = Runtime.getRuntime().exec(
               "/system/bin/chmod 0555 " + getScanBinaryPath(binaryName));
-        } catch (IOException ee ) {
+        } catch (IOException ee) {
           throw new RuntimeException("Failed to chmod", ee);
         }
       }

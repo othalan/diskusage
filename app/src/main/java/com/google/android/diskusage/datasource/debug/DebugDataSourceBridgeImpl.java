@@ -8,6 +8,7 @@ import com.google.android.diskusage.datasource.DebugDataSourceBridge;
 import java.io.IOException;
 
 public class DebugDataSourceBridgeImpl implements DebugDataSourceBridge {
+
   public DebugDataSourceBridgeImpl() {
   }
 

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class StreamCopy {
+
   public static void copyStream(InputStream is, OutputStream os)
       throws IOException {
     int len;

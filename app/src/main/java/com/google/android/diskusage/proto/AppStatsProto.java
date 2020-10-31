@@ -7,6 +7,7 @@ public final class AppStatsProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile AppStatsProto[] _emptyArray;
+
   public static AppStatsProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -186,7 +187,7 @@ public final class AppStatsProto extends
 
   @Override
   public AppStatsProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -261,7 +262,7 @@ public final class AppStatsProto extends
   }
 
   public static AppStatsProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new AppStatsProto().mergeFrom(input);
   }

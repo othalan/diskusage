@@ -7,6 +7,7 @@ import com.google.android.diskusage.datasource.AppInfo;
 import com.google.android.diskusage.datasource.PkgInfo;
 
 public class PkgInfoImpl implements PkgInfo {
+
   private final PackageInfo info;
   private final PackageManager pm;
 

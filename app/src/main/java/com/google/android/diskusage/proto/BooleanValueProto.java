@@ -7,6 +7,7 @@ public final class BooleanValueProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile BooleanValueProto[] _emptyArray;
+
   public static BooleanValueProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -58,14 +59,14 @@ public final class BooleanValueProto extends
     }
     if (this.exception != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(2, this.exception);
+          .computeMessageSize(2, this.exception);
     }
     return size;
   }
 
   @Override
   public BooleanValueProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -99,7 +100,7 @@ public final class BooleanValueProto extends
   }
 
   public static BooleanValueProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new BooleanValueProto().mergeFrom(input);
   }

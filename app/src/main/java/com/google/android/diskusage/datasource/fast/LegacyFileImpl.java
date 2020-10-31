@@ -30,8 +30,11 @@ public class LegacyFileImpl implements LegacyFile {
   @Override
   public boolean isLink() {
     try {
-      if (file.getCanonicalPath().equals(file.getPath())) return false;
-    } catch(Throwable ignored) {}
+      if (file.getCanonicalPath().equals(file.getPath())) {
+        return false;
+      }
+    } catch (Throwable ignored) {
+    }
     return true;
   }
 

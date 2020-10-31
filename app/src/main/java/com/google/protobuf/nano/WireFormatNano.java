@@ -33,41 +33,48 @@ package com.google.protobuf.nano;
 import java.io.IOException;
 
 /**
- * This class is used internally by the Protocol Buffer library and generated
- * message implementations.  It is public only because those generated messages
- * do not reside in the {@code protobuf} package.  Others should not use this
- * class directly.
- *
- * This class contains constants and helper functions useful for dealing with
- * the Protocol Buffer wire format.
+ * This class is used internally by the Protocol Buffer library and generated message
+ * implementations.  It is public only because those generated messages do not reside in the {@code
+ * protobuf} package.  Others should not use this class directly.
+ * <p>
+ * This class contains constants and helper functions useful for dealing with the Protocol Buffer
+ * wire format.
  *
  * @author kenton@google.com Kenton Varda
  */
 public final class WireFormatNano {
-  // Do not allow instantiation.
-  private WireFormatNano() {}
 
-  static final int WIRETYPE_VARINT           = 0;
-  static final int WIRETYPE_FIXED64          = 1;
+  // Do not allow instantiation.
+  private WireFormatNano() {
+  }
+
+  static final int WIRETYPE_VARINT = 0;
+  static final int WIRETYPE_FIXED64 = 1;
   static final int WIRETYPE_LENGTH_DELIMITED = 2;
-  static final int WIRETYPE_START_GROUP      = 3;
-  static final int WIRETYPE_END_GROUP        = 4;
-  static final int WIRETYPE_FIXED32          = 5;
+  static final int WIRETYPE_START_GROUP = 3;
+  static final int WIRETYPE_END_GROUP = 4;
+  static final int WIRETYPE_FIXED32 = 5;
 
   static final int TAG_TYPE_BITS = 3;
   static final int TAG_TYPE_MASK = (1 << TAG_TYPE_BITS) - 1;
 
-  /** Given a tag value, determines the wire type (the lower 3 bits). */
+  /**
+   * Given a tag value, determines the wire type (the lower 3 bits).
+   */
   static int getTagWireType(final int tag) {
     return tag & TAG_TYPE_MASK;
   }
 
-  /** Given a tag value, determines the field number (the upper 29 bits). */
+  /**
+   * Given a tag value, determines the field number (the upper 29 bits).
+   */
   public static int getTagFieldNumber(final int tag) {
     return tag >>> TAG_TYPE_BITS;
   }
 
-  /** Makes a tag value given a field number and wire type. */
+  /**
+   * Makes a tag value given a field number and wire type.
+   */
   static int makeTag(final int fieldNumber, final int wireType) {
     return (fieldNumber << TAG_TYPE_BITS) | wireType;
   }
@@ -99,11 +106,11 @@ public final class WireFormatNano {
    * Computes the array length of a repeated field. We assume that in the common case repeated
    * fields are contiguously serialized but we still correctly handle interspersed values of a
    * repeated field (but with extra allocations).
-   *
+   * <p>
    * Rewinds to current input position before returning.
    *
    * @param input stream input, pointing to the byte after the first tag
-   * @param tag repeated field tag just read
+   * @param tag   repeated field tag just read
    * @return length of array
    * @throws IOException
    */

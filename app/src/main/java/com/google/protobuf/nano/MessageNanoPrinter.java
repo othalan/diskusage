@@ -43,233 +43,234 @@ import java.util.Map;
  * @author flynn@google.com Andrew Flynn
  */
 public final class MessageNanoPrinter {
-    // Do not allow instantiation
-    private MessageNanoPrinter() {}
 
-    private static final String INDENT = "  ";
-    private static final int MAX_STRING_LEN = 200;
+  // Do not allow instantiation
+  private MessageNanoPrinter() {
+  }
 
-    /**
-     * Returns an text representation of a MessageNano suitable for debugging. The returned string
-     * is mostly compatible with Protocol Buffer's TextFormat (as provided by non-nano protocol
-     * buffers) -- groups (which are deprecated) are output with an underscore name (e.g. foo_bar
-     * instead of FooBar) and will thus not parse.
-     *
-     * <p>Employs Java reflection on the given object and recursively prints primitive fields,
-     * groups, and messages.</p>
-     */
-    public static <T extends MessageNano> String print(T message) {
-        if (message == null) {
-            return "";
-        }
+  private static final String INDENT = "  ";
+  private static final int MAX_STRING_LEN = 200;
 
-        StringBuffer buf = new StringBuffer();
-        try {
-            print(null, message, new StringBuffer(), buf);
-        } catch (IllegalAccessException e) {
-            return "Error printing proto: " + e.getMessage();
-        } catch (InvocationTargetException e) {
-            return "Error printing proto: " + e.getMessage();
-        }
-        return buf.toString();
+  /**
+   * Returns an text representation of a MessageNano suitable for debugging. The returned string is
+   * mostly compatible with Protocol Buffer's TextFormat (as provided by non-nano protocol buffers)
+   * -- groups (which are deprecated) are output with an underscore name (e.g. foo_bar instead of
+   * FooBar) and will thus not parse.
+   *
+   * <p>Employs Java reflection on the given object and recursively prints primitive fields,
+   * groups, and messages.</p>
+   */
+  public static <T extends MessageNano> String print(T message) {
+    if (message == null) {
+      return "";
     }
 
-    /**
-     * Function that will print the given message/field into the StringBuffer.
-     * Meant to be called recursively.
-     *
-     * @param identifier the identifier to use, or {@code null} if this is the root message to
-     *        print.
-     * @param object the value to print. May in fact be a primitive value or byte array and not a
-     *        message.
-     * @param indentBuf the indentation each line should begin with.
-     * @param buf the output buffer.
-     */
-    private static void print(String identifier, Object object,
-            StringBuffer indentBuf, StringBuffer buf) throws IllegalAccessException,
-            InvocationTargetException {
-        if (object == null) {
-            // This can happen if...
-            //   - we're about to print a message, String, or byte[], but it not present;
-            //   - we're about to print a primitive, but "reftype" optional style is enabled, and
-            //     the field is unset.
-            // In both cases the appropriate behavior is to output nothing.
-        } else if (object instanceof MessageNano) {  // Nano proto message
-            int origIndentBufLength = indentBuf.length();
-            if (identifier != null) {
-                buf.append(indentBuf).append(deCamelCaseify(identifier)).append(" <\n");
-                indentBuf.append(INDENT);
+    StringBuffer buf = new StringBuffer();
+    try {
+      print(null, message, new StringBuffer(), buf);
+    } catch (IllegalAccessException e) {
+      return "Error printing proto: " + e.getMessage();
+    } catch (InvocationTargetException e) {
+      return "Error printing proto: " + e.getMessage();
+    }
+    return buf.toString();
+  }
+
+  /**
+   * Function that will print the given message/field into the StringBuffer. Meant to be called
+   * recursively.
+   *
+   * @param identifier the identifier to use, or {@code null} if this is the root message to print.
+   * @param object     the value to print. May in fact be a primitive value or byte array and not a
+   *                   message.
+   * @param indentBuf  the indentation each line should begin with.
+   * @param buf        the output buffer.
+   */
+  private static void print(String identifier, Object object,
+      StringBuffer indentBuf, StringBuffer buf) throws IllegalAccessException,
+      InvocationTargetException {
+    if (object == null) {
+      // This can happen if...
+      //   - we're about to print a message, String, or byte[], but it not present;
+      //   - we're about to print a primitive, but "reftype" optional style is enabled, and
+      //     the field is unset.
+      // In both cases the appropriate behavior is to output nothing.
+    } else if (object instanceof MessageNano) {  // Nano proto message
+      int origIndentBufLength = indentBuf.length();
+      if (identifier != null) {
+        buf.append(indentBuf).append(deCamelCaseify(identifier)).append(" <\n");
+        indentBuf.append(INDENT);
+      }
+      Class<?> clazz = object.getClass();
+
+      // Proto fields follow one of two formats:
+      //
+      // 1) Public, non-static variables that do not begin or end with '_'
+      // Find and print these using declared public fields
+      for (Field field : clazz.getFields()) {
+        int modifiers = field.getModifiers();
+        String fieldName = field.getName();
+        if ("cachedSize".equals(fieldName)) {
+          // TODO(bduff): perhaps cachedSize should have a more obscure name.
+          continue;
+        }
+
+        if ((modifiers & Modifier.PUBLIC) == Modifier.PUBLIC
+            && (modifiers & Modifier.STATIC) != Modifier.STATIC
+            && !fieldName.startsWith("_")
+            && !fieldName.endsWith("_")) {
+          Class<?> fieldType = field.getType();
+          Object value = field.get(object);
+
+          if (fieldType.isArray()) {
+            Class<?> arrayType = fieldType.getComponentType();
+
+            // bytes is special since it's not repeated, but is represented by an array
+            if (arrayType == byte.class) {
+              print(fieldName, value, indentBuf, buf);
+            } else {
+              int len = value == null ? 0 : Array.getLength(value);
+              for (int i = 0; i < len; i++) {
+                Object elem = Array.get(value, i);
+                print(fieldName, elem, indentBuf, buf);
+              }
             }
-            Class<?> clazz = object.getClass();
-
-            // Proto fields follow one of two formats:
-            //
-            // 1) Public, non-static variables that do not begin or end with '_'
-            // Find and print these using declared public fields
-            for (Field field : clazz.getFields()) {
-                int modifiers = field.getModifiers();
-                String fieldName = field.getName();
-                if ("cachedSize".equals(fieldName)) {
-                    // TODO(bduff): perhaps cachedSize should have a more obscure name.
-                    continue;
-                }
-
-                if ((modifiers & Modifier.PUBLIC) == Modifier.PUBLIC
-                        && (modifiers & Modifier.STATIC) != Modifier.STATIC
-                        && !fieldName.startsWith("_")
-                        && !fieldName.endsWith("_")) {
-                    Class<?> fieldType = field.getType();
-                    Object value = field.get(object);
-
-                    if (fieldType.isArray()) {
-                        Class<?> arrayType = fieldType.getComponentType();
-
-                        // bytes is special since it's not repeated, but is represented by an array
-                        if (arrayType == byte.class) {
-                            print(fieldName, value, indentBuf, buf);
-                        } else {
-                            int len = value == null ? 0 : Array.getLength(value);
-                            for (int i = 0; i < len; i++) {
-                                Object elem = Array.get(value, i);
-                                print(fieldName, elem, indentBuf, buf);
-                            }
-                        }
-                    } else {
-                        print(fieldName, value, indentBuf, buf);
-                    }
-                }
-            }
-
-            // 2) Fields that are accessed via getter methods (when accessors
-            //    mode is turned on)
-            // Find and print these using getter methods.
-            for (Method method : clazz.getMethods()) {
-                String name = method.getName();
-                // Check for the setter accessor method since getters and hazzers both have
-                // non-proto-field name collisions (hashCode() and getSerializedSize())
-                if (name.startsWith("set")) {
-                    String subfieldName = name.substring(3);
-
-                    Method hazzer = null;
-                    try {
-                        hazzer = clazz.getMethod("has" + subfieldName);
-                    } catch (NoSuchMethodException e) {
-                        continue;
-                    }
-                    // If hazzer does't exist or returns false, no need to continue
-                    if (!(Boolean) hazzer.invoke(object)) {
-                        continue;
-                    }
-
-                    Method getter = null;
-                    try {
-                        getter = clazz.getMethod("get" + subfieldName);
-                    } catch (NoSuchMethodException e) {
-                        continue;
-                    }
-
-                    print(subfieldName, getter.invoke(object), indentBuf, buf);
-                }
-            }
-            if (identifier != null) {
-                indentBuf.setLength(origIndentBufLength);
-                buf.append(indentBuf).append(">\n");
-            }
-        } else if (object instanceof Map) {
-          Map<?,?> map = (Map<?,?>) object;
-          identifier = deCamelCaseify(identifier);
-
-          for (Map.Entry<?,?> entry : map.entrySet()) {
-            buf.append(indentBuf).append(identifier).append(" <\n");
-            int origIndentBufLength = indentBuf.length();
-            indentBuf.append(INDENT);
-            print("key", entry.getKey(), indentBuf, buf);
-            print("value", entry.getValue(), indentBuf, buf);
-            indentBuf.setLength(origIndentBufLength);
-            buf.append(indentBuf).append(">\n");
+          } else {
+            print(fieldName, value, indentBuf, buf);
           }
-        } else {
-            // Non-null primitive value
-            identifier = deCamelCaseify(identifier);
-            buf.append(indentBuf).append(identifier).append(": ");
-            if (object instanceof String) {
-                String stringMessage = sanitizeString((String) object);
-                buf.append("\"").append(stringMessage).append("\"");
-            } else if (object instanceof byte[]) {
-                appendQuotedBytes((byte[]) object, buf);
-            } else {
-                buf.append(object);
-            }
-            buf.append("\n");
         }
+      }
+
+      // 2) Fields that are accessed via getter methods (when accessors
+      //    mode is turned on)
+      // Find and print these using getter methods.
+      for (Method method : clazz.getMethods()) {
+        String name = method.getName();
+        // Check for the setter accessor method since getters and hazzers both have
+        // non-proto-field name collisions (hashCode() and getSerializedSize())
+        if (name.startsWith("set")) {
+          String subfieldName = name.substring(3);
+
+          Method hazzer = null;
+          try {
+            hazzer = clazz.getMethod("has" + subfieldName);
+          } catch (NoSuchMethodException e) {
+            continue;
+          }
+          // If hazzer does't exist or returns false, no need to continue
+          if (!(Boolean) hazzer.invoke(object)) {
+            continue;
+          }
+
+          Method getter = null;
+          try {
+            getter = clazz.getMethod("get" + subfieldName);
+          } catch (NoSuchMethodException e) {
+            continue;
+          }
+
+          print(subfieldName, getter.invoke(object), indentBuf, buf);
+        }
+      }
+      if (identifier != null) {
+        indentBuf.setLength(origIndentBufLength);
+        buf.append(indentBuf).append(">\n");
+      }
+    } else if (object instanceof Map) {
+      Map<?, ?> map = (Map<?, ?>) object;
+      identifier = deCamelCaseify(identifier);
+
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        buf.append(indentBuf).append(identifier).append(" <\n");
+        int origIndentBufLength = indentBuf.length();
+        indentBuf.append(INDENT);
+        print("key", entry.getKey(), indentBuf, buf);
+        print("value", entry.getValue(), indentBuf, buf);
+        indentBuf.setLength(origIndentBufLength);
+        buf.append(indentBuf).append(">\n");
+      }
+    } else {
+      // Non-null primitive value
+      identifier = deCamelCaseify(identifier);
+      buf.append(indentBuf).append(identifier).append(": ");
+      if (object instanceof String) {
+        String stringMessage = sanitizeString((String) object);
+        buf.append("\"").append(stringMessage).append("\"");
+      } else if (object instanceof byte[]) {
+        appendQuotedBytes((byte[]) object, buf);
+      } else {
+        buf.append(object);
+      }
+      buf.append("\n");
+    }
+  }
+
+  /**
+   * Converts an identifier of the format "FieldName" into "field_name".
+   */
+  private static String deCamelCaseify(String identifier) {
+    StringBuffer out = new StringBuffer();
+    for (int i = 0; i < identifier.length(); i++) {
+      char currentChar = identifier.charAt(i);
+      if (i == 0) {
+        out.append(Character.toLowerCase(currentChar));
+      } else if (Character.isUpperCase(currentChar)) {
+        out.append('_').append(Character.toLowerCase(currentChar));
+      } else {
+        out.append(currentChar);
+      }
+    }
+    return out.toString();
+  }
+
+  /**
+   * Shortens and escapes the given string.
+   */
+  private static String sanitizeString(String str) {
+    if (!str.startsWith("http") && str.length() > MAX_STRING_LEN) {
+      // Trim non-URL strings.
+      str = str.substring(0, MAX_STRING_LEN) + "[...]";
+    }
+    return escapeString(str);
+  }
+
+  /**
+   * Escape everything except for low ASCII code points.
+   */
+  private static String escapeString(String str) {
+    int strLen = str.length();
+    StringBuilder b = new StringBuilder(strLen);
+    for (int i = 0; i < strLen; i++) {
+      char original = str.charAt(i);
+      if (original >= ' ' && original <= '~' && original != '"' && original != '\'') {
+        b.append(original);
+      } else {
+        b.append(String.format("\\u%04x", (int) original));
+      }
+    }
+    return b.toString();
+  }
+
+  /**
+   * Appends a quoted byte array to the provided {@code StringBuffer}.
+   */
+  private static void appendQuotedBytes(byte[] bytes, StringBuffer builder) {
+    if (bytes == null) {
+      builder.append("\"\"");
+      return;
     }
 
-    /**
-     * Converts an identifier of the format "FieldName" into "field_name".
-     */
-    private static String deCamelCaseify(String identifier) {
-        StringBuffer out = new StringBuffer();
-        for (int i = 0; i < identifier.length(); i++) {
-            char currentChar = identifier.charAt(i);
-            if (i == 0) {
-                out.append(Character.toLowerCase(currentChar));
-            } else if (Character.isUpperCase(currentChar)) {
-                out.append('_').append(Character.toLowerCase(currentChar));
-            } else {
-                out.append(currentChar);
-            }
-        }
-        return out.toString();
+    builder.append('"');
+    for (int i = 0; i < bytes.length; ++i) {
+      int ch = bytes[i] & 0xff;
+      if (ch == '\\' || ch == '"') {
+        builder.append('\\').append((char) ch);
+      } else if (ch >= 32 && ch < 127) {
+        builder.append((char) ch);
+      } else {
+        builder.append(String.format("\\%03o", ch));
+      }
     }
-
-    /**
-     * Shortens and escapes the given string.
-     */
-    private static String sanitizeString(String str) {
-        if (!str.startsWith("http") && str.length() > MAX_STRING_LEN) {
-            // Trim non-URL strings.
-            str = str.substring(0, MAX_STRING_LEN) + "[...]";
-        }
-        return escapeString(str);
-    }
-
-    /**
-     * Escape everything except for low ASCII code points.
-     */
-    private static String escapeString(String str) {
-        int strLen = str.length();
-        StringBuilder b = new StringBuilder(strLen);
-        for (int i = 0; i < strLen; i++) {
-            char original = str.charAt(i);
-            if (original >= ' ' && original <= '~' && original != '"' && original != '\'') {
-                b.append(original);
-            } else {
-                b.append(String.format("\\u%04x", (int) original));
-            }
-        }
-        return b.toString();
-    }
-
-    /**
-     * Appends a quoted byte array to the provided {@code StringBuffer}.
-     */
-    private static void appendQuotedBytes(byte[] bytes, StringBuffer builder) {
-        if (bytes == null) {
-            builder.append("\"\"");
-            return;
-        }
-
-        builder.append('"');
-        for (int i = 0; i < bytes.length; ++i) {
-            int ch = bytes[i] & 0xff;
-            if (ch == '\\' || ch == '"') {
-                builder.append('\\').append((char) ch);
-            } else if (ch >= 32 && ch < 127) {
-                builder.append((char) ch);
-            } else {
-                builder.append(String.format("\\%03o", ch));
-            }
-        }
-        builder.append('"');
-    }
+    builder.append('"');
+  }
 }

@@ -11,6 +11,7 @@ import com.google.android.diskusage.entity.FileSystemSuperRoot;
 import com.google.android.diskusage.opengl.FileSystemViewGPU;
 
 public class RendererManager {
+
   private static final String HW_RENDERER = "hw_renderer";
 
   private final DiskUsage diskusage;
@@ -33,8 +34,8 @@ public class RendererManager {
   public boolean isHardwareRendererSupported() {
     final int sdkVersion = DataSource.get().getAndroidVersion();
     if (android.os.Build.DEVICE.equals("bravo")) {
-        return sdkVersion < Build.VERSION_CODES.ECLAIR
-                || sdkVersion > Build.VERSION_CODES.GINGERBREAD;
+      return sdkVersion < Build.VERSION_CODES.ECLAIR
+          || sdkVersion > Build.VERSION_CODES.GINGERBREAD;
     }
     return true;
   }
@@ -53,16 +54,16 @@ public class RendererManager {
 
     if (warnAboutIncompatibility()) {
       new AlertDialog.Builder(diskusage)
-      .setCancelable(true)
-      .setIcon(android.R.drawable.ic_dialog_alert)
-      .setTitle("WARNING!")
-      .setMessage("Hardware renderer may CRASH your PHONE.\n\n" +
-      "There is a firmware bug in a number of HTC phones with Android 2.2 (Froyo).")
-      .setPositiveButton("Proceeed", (dialog, which) -> finishRendererSwitch(root))
-      .setNegativeButton("Cancel", (dialog, which) -> {
-      })
-      .setOnCancelListener(dialog -> {
-      }).create().show();
+          .setCancelable(true)
+          .setIcon(android.R.drawable.ic_dialog_alert)
+          .setTitle("WARNING!")
+          .setMessage("Hardware renderer may CRASH your PHONE.\n\n" +
+              "There is a firmware bug in a number of HTC phones with Android 2.2 (Froyo).")
+          .setPositiveButton("Proceeed", (dialog, which) -> finishRendererSwitch(root))
+          .setNegativeButton("Cancel", (dialog, which) -> {
+          })
+          .setOnCancelListener(dialog -> {
+          }).create().show();
       return;
     }
     finishRendererSwitch(root);

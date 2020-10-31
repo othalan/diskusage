@@ -7,6 +7,7 @@ public final class Dump extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile Dump[] _emptyArray;
+
   public static Dump[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -152,13 +153,13 @@ public final class Dump extends
     }
     if (this.proc != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(4, this.proc);
+          .computeMessageSize(4, this.proc);
     }
     if (this.appInfo != null && this.appInfo.length > 0) {
       for (AppInfoProto element : this.appInfo) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-                  .computeMessageSize(5, element);
+              .computeMessageSize(5, element);
         }
       }
     }
@@ -166,25 +167,25 @@ public final class Dump extends
       for (StatFsProto element : this.statFs) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-                  .computeMessageSize(6, element);
+              .computeMessageSize(6, element);
         }
       }
     }
     if (this.externalFilesDir != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(8, this.externalFilesDir);
+          .computeMessageSize(8, this.externalFilesDir);
     }
     if (this.externalFilesDirs != null && this.externalFilesDirs.length > 0) {
       for (PortableFileProto element : this.externalFilesDirs) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-                  .computeMessageSize(9, element);
+              .computeMessageSize(9, element);
         }
       }
     }
     if (this.externalStorageDirectory != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(10, this.externalStorageDirectory);
+          .computeMessageSize(10, this.externalStorageDirectory);
     }
     if (this.isDeviceRooted) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
@@ -194,20 +195,20 @@ public final class Dump extends
       for (NativeScanProto element : this.nativeScan) {
         if (element != null) {
           size += com.google.protobuf.nano.CodedOutputByteBufferNano
-                  .computeMessageSize(12, element);
+              .computeMessageSize(12, element);
         }
       }
     }
     if (this.legacyScan != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(13, this.legacyScan);
+          .computeMessageSize(13, this.legacyScan);
     }
     return size;
   }
 
   @Override
   public Dump mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -354,7 +355,7 @@ public final class Dump extends
   }
 
   public static Dump parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new Dump().mergeFrom(input);
   }

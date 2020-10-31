@@ -7,6 +7,7 @@ public final class LegacyScan extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile LegacyScan[] _emptyArray;
+
   public static LegacyScan[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -54,7 +55,7 @@ public final class LegacyScan extends
 
   @Override
   public LegacyScan mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -81,7 +82,7 @@ public final class LegacyScan extends
   }
 
   public static LegacyScan parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new LegacyScan().mergeFrom(input);
   }

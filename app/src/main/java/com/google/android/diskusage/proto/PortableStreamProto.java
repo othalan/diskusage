@@ -7,6 +7,7 @@ public final class PortableStreamProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile PortableStreamProto[] _emptyArray;
+
   public static PortableStreamProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -65,18 +66,18 @@ public final class PortableStreamProto extends
     }
     if (this.readException != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(2, this.readException);
+          .computeMessageSize(2, this.readException);
     }
     if (this.closeException != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(3, this.closeException);
+          .computeMessageSize(3, this.closeException);
     }
     return size;
   }
 
   @Override
   public PortableStreamProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -117,7 +118,7 @@ public final class PortableStreamProto extends
   }
 
   public static PortableStreamProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new PortableStreamProto().mergeFrom(input);
   }

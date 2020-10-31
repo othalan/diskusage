@@ -9,6 +9,7 @@ import com.google.android.diskusage.datasource.PortableFile;
 import java.io.File;
 
 public class PortableFileImpl implements PortableFile {
+
   private final File file;
 
   private PortableFileImpl(File file) {

@@ -17,6 +17,7 @@ import android.widget.LinearLayout.LayoutParams;
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
 
 public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
+
   private String searchPattern;
   protected View searchBar;
   protected EditText searchBox;
@@ -25,10 +26,11 @@ public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
   public DiskUsageMenuPreCupcake(DiskUsage diskusage) {
     super(diskusage);
   }
-  
+
   @Override
-  public void onCreate() {}
-  
+  public void onCreate() {
+  }
+
   @Override
   public boolean readyToFinish() {
     if (searchPattern != null) {
@@ -37,13 +39,13 @@ public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
     }
     return true;
   }
-  
+
   @Override
   public void searchRequest() {
     searchBar.setVisibility(View.VISIBLE);
     searchBox.requestFocus();
   }
-  
+
   @Override
   public boolean finishedSearch(FileSystemSuperRoot newRoot, String searchQuery) {
     boolean matched = super.finishedSearch(newRoot, searchQuery);
@@ -54,23 +56,22 @@ public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
     }
     return matched;
   }
-  
+
   @Override
   public void wrapAndSetContentView(View view, FileSystemSuperRoot newRoot) {
     super.wrapAndSetContentView(view, newRoot);
-    
+
     diskusage.setContentView(R.layout.main);
     LinearLayout searchLayout =
-      (LinearLayout) diskusage.findViewById(R.id.search_layout);
-    searchLayout.addView((View)view, new LinearLayout.LayoutParams(
-      LayoutParams.MATCH_PARENT, 0, 1.f));
+        (LinearLayout) diskusage.findViewById(R.id.search_layout);
+    searchLayout.addView((View) view, new LinearLayout.LayoutParams(
+        LayoutParams.MATCH_PARENT, 0, 1.f));
 
-    
     searchBar = diskusage.findViewById(R.id.search_bar);
     Button cancelSearch = (Button) diskusage.findViewById(R.id.cancel_button);
     searchBox = (EditText) diskusage.findViewById(R.id.search_box);
     origSearchBackground = searchBox.getBackground();
-    
+
     cancelSearch.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -99,17 +100,20 @@ public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
         searchPattern = s.toString();
         applyPattern(searchPattern);
       }
-      
+
       @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-      
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
       @Override
-      public void afterTextChanged(Editable s) {}
+      public void afterTextChanged(Editable s) {
+      }
     });
   }
-  
-  public void hideInputMethod() {}
-  
+
+  public void hideInputMethod() {
+  }
+
   public void cancelSearch() {
     searchBar.setVisibility(View.GONE);
     searchBox.setText("");
@@ -117,7 +121,7 @@ public class DiskUsageMenuPreCupcake extends DiskUsageMenu {
     searchPattern = null;
     hideInputMethod();
   }
-  
+
   @Override
   public MenuItem makeSearchMenuEntry(Menu menu) {
     MenuItem item = menu.add(R.string.button_search);

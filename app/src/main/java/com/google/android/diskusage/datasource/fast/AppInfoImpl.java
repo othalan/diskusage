@@ -8,6 +8,7 @@ import android.os.Build;
 import com.google.android.diskusage.datasource.AppInfo;
 
 public class AppInfoImpl implements AppInfo {
+
   private final ApplicationInfo app;
   private final PackageManager pm;
 

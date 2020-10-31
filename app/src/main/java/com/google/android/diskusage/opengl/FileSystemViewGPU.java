@@ -13,11 +13,12 @@ import com.google.android.diskusage.FileSystemState.FileSystemView;
 import com.google.android.diskusage.FileSystemState.MyMotionEvent;
 
 public final class FileSystemViewGPU extends SurfaceView
-                                     implements FileSystemView, SurfaceHolder.Callback {
+    implements FileSystemView, SurfaceHolder.Callback {
+
   FileSystemState eventHandler;
   private final AbstractRenderingThread thread;
 
-  
+
   public FileSystemViewGPU(DiskUsage context, FileSystemState eventHandler) {
     super(context);
     this.eventHandler = eventHandler;
@@ -37,9 +38,9 @@ public final class FileSystemViewGPU extends SurfaceView
 
   @Override
   public final boolean onTouchEvent(final MotionEvent ev) {
-    final MyMotionEvent myev = 
-      eventHandler.multitouchHandler.newMyMotionEvent(ev);
-      thread.addEvent(new Runnable() {
+    final MyMotionEvent myev =
+        eventHandler.multitouchHandler.newMyMotionEvent(ev);
+    thread.addEvent(new Runnable() {
       @Override
       public void run() {
         eventHandler.onTouchEvent(myev);
@@ -48,23 +49,27 @@ public final class FileSystemViewGPU extends SurfaceView
 
     return true;
   }
-  
+
   public final void runInRenderThread(final Runnable r) {
     thread.addEvent(r);
   }
-  
+
   public void requestRepaintGPU() {
     if (thread != null) {
       thread.addEmptyEvent();
     }
   }
-  
-  public void requestRepaint() {}
-  public void requestRepaint(int l, int t, int r, int b) {}
+
+  public void requestRepaint() {
+  }
+
+  public void requestRepaint(int l, int t, int r, int b) {
+  }
 
   @Override
-  protected final void onDraw(final Canvas canvas) {}
-  
+  protected final void onDraw(final Canvas canvas) {
+  }
+
   @Override
   public final boolean onKeyDown(final int keyCode, final KeyEvent event) {
     thread.addEvent(new Runnable() {
@@ -84,9 +89,9 @@ public final class FileSystemViewGPU extends SurfaceView
         return true;
     }
 
-      return super.onKeyDown(keyCode, event);
+    return super.onKeyDown(keyCode, event);
   }
-  
+
   @Override
   protected final void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
@@ -111,14 +116,14 @@ public final class FileSystemViewGPU extends SurfaceView
     holder.removeCallback(this);
     thread.addEvent(thread.new SurfaceAvailableEvent(holder, false));
   }
-  
+
   @Override
   protected void onDetachedFromWindow() {
     Log.d("diskusage", "FileSystemViewGPU.onDetachedFromWindow");
-      super.onDetachedFromWindow();
-      thread.addEvent(thread.new ExitEvent());
+    super.onDetachedFromWindow();
+    thread.addEvent(thread.new ExitEvent());
   }
-  
+
   @Override
   public void invalidate() {
     super.invalidate();

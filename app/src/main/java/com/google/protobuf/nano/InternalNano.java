@@ -40,106 +40,97 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * The classes contained within are used internally by the Protocol Buffer
- * library and generated message implementations. They are public only because
- * those generated messages do not reside in the {@code protobuf} package.
- * Others should not use this class directly.
+ * The classes contained within are used internally by the Protocol Buffer library and generated
+ * message implementations. They are public only because those generated messages do not reside in
+ * the {@code protobuf} package. Others should not use this class directly.
  *
  * @author kenton@google.com (Kenton Varda)
  */
 public final class InternalNano {
 
-  public static final int TYPE_DOUBLE   = 1;
-  public static final int TYPE_FLOAT    = 2;
-  public static final int TYPE_INT64    = 3;
-  public static final int TYPE_UINT64   = 4;
-  public static final int TYPE_INT32    = 5;
-  public static final int TYPE_FIXED64  = 6;
-  public static final int TYPE_FIXED32  = 7;
-  public static final int TYPE_BOOL     = 8;
-  public static final int TYPE_STRING   = 9;
-  public static final int TYPE_GROUP    = 10;
-  public static final int TYPE_MESSAGE  = 11;
-  public static final int TYPE_BYTES    = 12;
-  public static final int TYPE_UINT32   = 13;
-  public static final int TYPE_ENUM     = 14;
+  public static final int TYPE_DOUBLE = 1;
+  public static final int TYPE_FLOAT = 2;
+  public static final int TYPE_INT64 = 3;
+  public static final int TYPE_UINT64 = 4;
+  public static final int TYPE_INT32 = 5;
+  public static final int TYPE_FIXED64 = 6;
+  public static final int TYPE_FIXED32 = 7;
+  public static final int TYPE_BOOL = 8;
+  public static final int TYPE_STRING = 9;
+  public static final int TYPE_GROUP = 10;
+  public static final int TYPE_MESSAGE = 11;
+  public static final int TYPE_BYTES = 12;
+  public static final int TYPE_UINT32 = 13;
+  public static final int TYPE_ENUM = 14;
   public static final int TYPE_SFIXED32 = 15;
   public static final int TYPE_SFIXED64 = 16;
-  public static final int TYPE_SINT32   = 17;
-  public static final int TYPE_SINT64   = 18;
+  public static final int TYPE_SINT32 = 17;
+  public static final int TYPE_SINT64 = 18;
 
   protected static final Charset UTF_8 = StandardCharsets.UTF_8;
   protected static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
 
-  private InternalNano() {}
+  private InternalNano() {
+  }
 
   /**
-   * An object to provide synchronization when lazily initializing static fields
-   * of {@link MessageNano} subclasses.
+   * An object to provide synchronization when lazily initializing static fields of {@link
+   * MessageNano} subclasses.
    * <p>
-   * To enable earlier versions of ProGuard to inline short methods from a
-   * generated MessageNano subclass to the call sites, that class must not have
-   * a class initializer, which will be created if there is any static variable
-   * initializers. To lazily initialize the static variables in a thread-safe
-   * manner, the initialization code will synchronize on this object.
+   * To enable earlier versions of ProGuard to inline short methods from a generated MessageNano
+   * subclass to the call sites, that class must not have a class initializer, which will be created
+   * if there is any static variable initializers. To lazily initialize the static variables in a
+   * thread-safe manner, the initialization code will synchronize on this object.
    */
   public static final Object LAZY_INIT_LOCK = new Object();
 
   /**
-   * Helper called by generated code to construct default values for string
-   * fields.
+   * Helper called by generated code to construct default values for string fields.
    * <p>
-   * The protocol compiler does not actually contain a UTF-8 decoder -- it
-   * just pushes UTF-8-encoded text around without touching it.  The one place
-   * where this presents a problem is when generating Java string literals.
-   * Unicode characters in the string literal would normally need to be encoded
-   * using a Unicode escape sequence, which would require decoding them.
-   * To get around this, protoc instead embeds the UTF-8 bytes into the
-   * generated code and leaves it to the runtime library to decode them.
+   * The protocol compiler does not actually contain a UTF-8 decoder -- it just pushes UTF-8-encoded
+   * text around without touching it.  The one place where this presents a problem is when
+   * generating Java string literals. Unicode characters in the string literal would normally need
+   * to be encoded using a Unicode escape sequence, which would require decoding them. To get around
+   * this, protoc instead embeds the UTF-8 bytes into the generated code and leaves it to the
+   * runtime library to decode them.
    * <p>
-   * It gets worse, though.  If protoc just generated a byte array, like:
-   *   new byte[] {0x12, 0x34, 0x56, 0x78}
-   * Java actually generates *code* which allocates an array and then fills
-   * in each value.  This is much less efficient than just embedding the bytes
-   * directly into the bytecode.  To get around this, we need another
-   * work-around.  String literals are embedded directly, so protoc actually
-   * generates a string literal corresponding to the bytes.  The easiest way
-   * to do this is to use the ISO-8859-1 character set, which corresponds to
-   * the first 256 characters of the Unicode range.  Protoc can then use
-   * good old CEscape to generate the string.
+   * It gets worse, though.  If protoc just generated a byte array, like: new byte[] {0x12, 0x34,
+   * 0x56, 0x78} Java actually generates *code* which allocates an array and then fills in each
+   * value.  This is much less efficient than just embedding the bytes directly into the bytecode.
+   * To get around this, we need another work-around.  String literals are embedded directly, so
+   * protoc actually generates a string literal corresponding to the bytes.  The easiest way to do
+   * this is to use the ISO-8859-1 character set, which corresponds to the first 256 characters of
+   * the Unicode range.  Protoc can then use good old CEscape to generate the string.
    * <p>
-   * So we have a string literal which represents a set of bytes which
-   * represents another string.  This function -- stringDefaultValue --
-   * converts from the generated string to the string we actually want.  The
-   * generated code calls this automatically.
+   * So we have a string literal which represents a set of bytes which represents another string.
+   * This function -- stringDefaultValue -- converts from the generated string to the string we
+   * actually want.  The generated code calls this automatically.
    */
   public static String stringDefaultValue(String bytes) {
     return new String(bytes.getBytes(ISO_8859_1), InternalNano.UTF_8);
   }
 
   /**
-   * Helper called by generated code to construct default values for bytes
-   * fields.
+   * Helper called by generated code to construct default values for bytes fields.
    * <p>
-   * This is a lot like {@link #stringDefaultValue}, but for bytes fields.
-   * In this case we only need the second of the two hacks -- allowing us to
-   * embed raw bytes as a string literal with ISO-8859-1 encoding.
+   * This is a lot like {@link #stringDefaultValue}, but for bytes fields. In this case we only need
+   * the second of the two hacks -- allowing us to embed raw bytes as a string literal with
+   * ISO-8859-1 encoding.
    */
   public static byte[] bytesDefaultValue(String bytes) {
     return bytes.getBytes(ISO_8859_1);
   }
 
   /**
-   * Helper function to convert a string into UTF-8 while turning the
-   * UnsupportedEncodingException to a RuntimeException.
+   * Helper function to convert a string into UTF-8 while turning the UnsupportedEncodingException
+   * to a RuntimeException.
    */
   public static byte[] copyFromUtf8(final String text) {
     return text.getBytes(InternalNano.UTF_8);
   }
 
   /**
-   * Checks repeated int field equality; null-value and 0-length fields are
-   * considered equal.
+   * Checks repeated int field equality; null-value and 0-length fields are considered equal.
    */
   public static boolean equals(int[] field1, int[] field2) {
     if (field1 == null || field1.length == 0) {
@@ -150,8 +141,7 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated long field equality; null-value and 0-length fields are
-   * considered equal.
+   * Checks repeated long field equality; null-value and 0-length fields are considered equal.
    */
   public static boolean equals(long[] field1, long[] field2) {
     if (field1 == null || field1.length == 0) {
@@ -162,8 +152,7 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated float field equality; null-value and 0-length fields are
-   * considered equal.
+   * Checks repeated float field equality; null-value and 0-length fields are considered equal.
    */
   public static boolean equals(float[] field1, float[] field2) {
     if (field1 == null || field1.length == 0) {
@@ -174,8 +163,7 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated double field equality; null-value and 0-length fields are
-   * considered equal.
+   * Checks repeated double field equality; null-value and 0-length fields are considered equal.
    */
   public static boolean equals(double[] field1, double[] field2) {
     if (field1 == null || field1.length == 0) {
@@ -186,8 +174,7 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated boolean field equality; null-value and 0-length fields are
-   * considered equal.
+   * Checks repeated boolean field equality; null-value and 0-length fields are considered equal.
    */
   public static boolean equals(boolean[] field1, boolean[] field2) {
     if (field1 == null || field1.length == 0) {
@@ -198,10 +185,9 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated bytes field equality. Only non-null elements are tested.
-   * Returns true if the two fields have the same sequence of non-null
-   * elements. Null-value fields and fields of any length with only null
-   * elements are considered equal.
+   * Checks repeated bytes field equality. Only non-null elements are tested. Returns true if the
+   * two fields have the same sequence of non-null elements. Null-value fields and fields of any
+   * length with only null elements are considered equal.
    */
   public static boolean equals(byte[][] field1, byte[][] field2) {
     int index1 = 0;
@@ -233,10 +219,9 @@ public final class InternalNano {
   }
 
   /**
-   * Checks repeated string/message field equality. Only non-null elements are
-   * tested. Returns true if the two fields have the same sequence of non-null
-   * elements. Null-value fields and fields of any length with only null
-   * elements are considered equal.
+   * Checks repeated string/message field equality. Only non-null elements are tested. Returns true
+   * if the two fields have the same sequence of non-null elements. Null-value fields and fields of
+   * any length with only null elements are considered equal.
    */
   public static boolean equals(Object[] field1, Object[] field2) {
     int index1 = 0;
@@ -268,49 +253,49 @@ public final class InternalNano {
   }
 
   /**
-   * Computes the hash code of a repeated int field. Null-value and 0-length
-   * fields have the same hash code.
+   * Computes the hash code of a repeated int field. Null-value and 0-length fields have the same
+   * hash code.
    */
   public static int hashCode(int[] field) {
     return field == null || field.length == 0 ? 0 : Arrays.hashCode(field);
   }
 
   /**
-   * Computes the hash code of a repeated long field. Null-value and 0-length
-   * fields have the same hash code.
+   * Computes the hash code of a repeated long field. Null-value and 0-length fields have the same
+   * hash code.
    */
   public static int hashCode(long[] field) {
     return field == null || field.length == 0 ? 0 : Arrays.hashCode(field);
   }
 
   /**
-   * Computes the hash code of a repeated float field. Null-value and 0-length
-   * fields have the same hash code.
+   * Computes the hash code of a repeated float field. Null-value and 0-length fields have the same
+   * hash code.
    */
   public static int hashCode(float[] field) {
     return field == null || field.length == 0 ? 0 : Arrays.hashCode(field);
   }
 
   /**
-   * Computes the hash code of a repeated double field. Null-value and 0-length
-   * fields have the same hash code.
+   * Computes the hash code of a repeated double field. Null-value and 0-length fields have the same
+   * hash code.
    */
   public static int hashCode(double[] field) {
     return field == null || field.length == 0 ? 0 : Arrays.hashCode(field);
   }
 
   /**
-   * Computes the hash code of a repeated boolean field. Null-value and 0-length
-   * fields have the same hash code.
+   * Computes the hash code of a repeated boolean field. Null-value and 0-length fields have the
+   * same hash code.
    */
   public static int hashCode(boolean[] field) {
     return field == null || field.length == 0 ? 0 : Arrays.hashCode(field);
   }
 
   /**
-   * Computes the hash code of a repeated bytes field. Only the sequence of all
-   * non-null elements are used in the computation. Null-value fields and fields
-   * of any length with only null elements have the same hash code.
+   * Computes the hash code of a repeated bytes field. Only the sequence of all non-null elements
+   * are used in the computation. Null-value fields and fields of any length with only null elements
+   * have the same hash code.
    */
   public static int hashCode(byte[][] field) {
     int result = 0;
@@ -324,10 +309,9 @@ public final class InternalNano {
   }
 
   /**
-   * Computes the hash code of a repeated string/message field. Only the
-   * sequence of all non-null elements are used in the computation. Null-value
-   * fields and fields of any length with only null elements have the same hash
-   * code.
+   * Computes the hash code of a repeated string/message field. Only the sequence of all non-null
+   * elements are used in the computation. Null-value fields and fields of any length with only null
+   * elements have the same hash code.
    */
   public static int hashCode(Object[] field) {
     int result = 0;
@@ -339,6 +323,7 @@ public final class InternalNano {
     }
     return result;
   }
+
   private static Object primitiveDefaultValue(int type) {
     switch (type) {
       case TYPE_BOOL:
@@ -373,18 +358,18 @@ public final class InternalNano {
   }
 
   /**
-   * Merges the map entry into the map field. Note this is only supposed to
-   * be called by generated messages.
+   * Merges the map entry into the map field. Note this is only supposed to be called by generated
+   * messages.
    *
-   * @param map the map field; may be null, in which case a map will be
-   *        instantiated using the {@link MapFactories.MapFactory}
-   * @param input the input byte buffer
-   * @param keyType key type, as defined in InternalNano.TYPE_*
+   * @param map       the map field; may be null, in which case a map will be instantiated using the
+   *                  {@link MapFactories.MapFactory}
+   * @param input     the input byte buffer
+   * @param keyType   key type, as defined in InternalNano.TYPE_*
    * @param valueType value type, as defined in InternalNano.TYPE_*
-   * @param value an new instance of the value, if the value is a TYPE_MESSAGE;
-   *        otherwise this parameter can be null and will be ignored.
-   * @param keyTag wire tag for the key
-   * @param valueTag wire tag for the value
+   * @param value     an new instance of the value, if the value is a TYPE_MESSAGE; otherwise this
+   *                  parameter can be null and will be ignored.
+   * @param keyTag    wire tag for the key
+   * @param valueTag  wire tag for the value
    * @return the map field
    * @throws IOException
    */
@@ -441,8 +426,8 @@ public final class InternalNano {
   public static <K, V> void serializeMapField(
       CodedOutputByteBufferNano output,
       Map<K, V> map, int number, int keyType, int valueType)
-          throws IOException {
-    for (Entry<K, V> entry: map.entrySet()) {
+      throws IOException {
+    for (Entry<K, V> entry : map.entrySet()) {
       K key = entry.getKey();
       V value = entry.getValue();
       if (key == null || value == null) {
@@ -451,7 +436,7 @@ public final class InternalNano {
       }
       int entrySize =
           CodedOutputByteBufferNano.computeFieldSize(1, keyType, key) +
-          CodedOutputByteBufferNano.computeFieldSize(2, valueType, value);
+              CodedOutputByteBufferNano.computeFieldSize(2, valueType, value);
       output.writeTag(number, WireFormatNano.WIRETYPE_LENGTH_DELIMITED);
       output.writeRawVarint32(entrySize);
       output.writeField(1, keyType, key);
@@ -463,7 +448,7 @@ public final class InternalNano {
       Map<K, V> map, int number, int keyType, int valueType) {
     int size = 0;
     int tagSize = CodedOutputByteBufferNano.computeTagSize(number);
-    for (Entry<K, V> entry: map.entrySet()) {
+    for (Entry<K, V> entry : map.entrySet()) {
       K key = entry.getKey();
       V value = entry.getValue();
       if (key == null || value == null) {
@@ -472,7 +457,7 @@ public final class InternalNano {
       }
       int entrySize =
           CodedOutputByteBufferNano.computeFieldSize(1, keyType, key) +
-          CodedOutputByteBufferNano.computeFieldSize(2, valueType, value);
+              CodedOutputByteBufferNano.computeFieldSize(2, valueType, value);
       size += tagSize + entrySize
           + CodedOutputByteBufferNano.computeRawVarint32Size(entrySize);
     }
@@ -480,9 +465,8 @@ public final class InternalNano {
   }
 
   /**
-   * Checks whether two {@link Map} are equal. We don't use the default equals
-   * method of {@link Map} because it compares by identity not by content for
-   * byte arrays.
+   * Checks whether two {@link Map} are equal. We don't use the default equals method of {@link Map}
+   * because it compares by identity not by content for byte arrays.
    */
   public static <K, V> boolean equals(Map<K, V> a, Map<K, V> b) {
     if (a == b) {

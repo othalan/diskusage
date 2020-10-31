@@ -26,16 +26,17 @@ import javax.microedition.khronos.opengles.GL10;
 
 
 public class RenderingThread extends AbstractRenderingThread {
+
   private final Context context;
   private final FileSystemState eventHandler;
-  
+
   private static final float[][] vertexData = {
-    { 0.1f,  0.2f, 0},
-    { 0.9f,  0.2f, 0},
-    { 0.9f,  0.9f, 0},
-    { 0.1f,  0.9f, 0}
+      {0.1f, 0.2f, 0},
+      {0.9f, 0.2f, 0},
+      {0.9f, 0.9f, 0},
+      {0.1f, 0.9f, 0}
   };
-  
+
   private final ShortBuffer indicies;
   private final FloatBuffer vertexBuffer;
   private final FloatBuffer texCoords;
@@ -45,29 +46,29 @@ public class RenderingThread extends AbstractRenderingThread {
   public Square specialSquare;
   public SmallSquare smallSquare;
   public CursorFrame cursorSquare;
-  
+
   private final static int TEXTURE_SIZE = 1 << 7;
 
-  
+
   float[] matrix = new float[16];
-  
+
   private static final int MAX_RECTS = 100;
-  
+
   private static final int MAX_INDEXES = MAX_RECTS * 6;
   private static final int MAX_VERTEX = MAX_RECTS * 4;
-  
+
   private static final int SIZEOF_SHORT = 2;
   private static final int SIZEOF_FLOAT = 4;
-  
-  private static final int MAX_TEXT_DRAWS_PER_TEXTURE = 100; 
+
+  private static final int MAX_TEXT_DRAWS_PER_TEXTURE = 100;
   private static final int MAX_TEXT_VERTEXES = MAX_TEXT_DRAWS_PER_TEXTURE * 4;
   private static final int MAX_TEXT_TEXCOORDS = MAX_TEXT_VERTEXES * 2;
-  
-//  private float[] dirVertexes = new float[MAX_VERTEX * 3];
+
+  //  private float[] dirVertexes = new float[MAX_VERTEX * 3];
 //private float[] fileVertexes = new float[MAX_VERTEX * 3];
   private final float[] textureVertexes = new float[4 * 3];
-  
-  
+
+
   private BitmapMap currentBitmapMap;
   private Bitmap editedBitmap;
   private Canvas editedCanvas;
@@ -77,10 +78,11 @@ public class RenderingThread extends AbstractRenderingThread {
   private float textBaseline;
   private static final int padding = FileSystemEntry.padding;
   ArrayList<BitmapMap> bitmaps = new ArrayList<BitmapMap>();
-  
+
   private static final float divTexSize = 1.f / TEXTURE_SIZE;
   private float max_usage;
-//  private static final Paint textBgPaint = new Paint();
+
+  //  private static final Paint textBgPaint = new Paint();
   static {
     textPaint.setColor(Color.parseColor("#FFFFFF"));
     textPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -90,7 +92,7 @@ public class RenderingThread extends AbstractRenderingThread {
 //    textBgPaint.setStyle(Paint.Style.STROKE);
 //    textBgPaint.setFlags(textPaint.getFlags() | Paint.ANTI_ALIAS_FLAG);
   }
-  
+
   public void updateFonts(Context context) {
     float scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
     float density = context.getResources().getDisplayMetrics().density;
@@ -99,53 +101,55 @@ public class RenderingThread extends AbstractRenderingThread {
     int height = context.getResources().getDisplayMetrics().heightPixels;
     int min = Math.min(width, height);
     float minInch = min / dpi; // my tablet: 5 inch height
-                               // my phone: 2 inc width
+    // my phone: 2 inc width
     Log.d("diskusage", "screen inch = " + minInch);
-    
+
     float defaultSize = textPaint.getTextSize();
     textPaint.setTextSize(20);
-    
+
     // Atleast 4 times "Storage Card" should fit into the screen
     float textSize = 20 * min / (textPaint.measureText("Storage card") * 4);
-    
+
     // 20 px font, seems confortable enough, if we end up with the font larger
     // than that, we may want to fit 2x more data.
     if (textSize > 20) {
       textSize /= 2;
-      
+
       // In case we cannot fit 2x more data, we at least fit [1.0, 2.0]x more.
       if (textSize < 20) {
         textSize = 20;
       }
     }
-    
+
     // For low DPI devices, font size should never go below 12 px (which seems to be default value).
-    if (textSize < defaultSize) textSize = defaultSize;
-    
+    if (textSize < defaultSize) {
+      textSize = defaultSize;
+    }
+
     // For very high DPI devices, we might want to check if the physical size of letters is sufficient
     // Let's say, 20 px font on 300 dpi devices seems readable enough: 
     if (textSize / dpi < 20 / 300.f) {
       textSize = 20.f / 300.f * dpi;
     }
-    
+
     textPaint.setTextSize(textSize);
-    textBaseline = - textPaint.ascent() + FileSystemEntry.padding;
-    textHeight = (int)(textPaint.descent() - textPaint.ascent() + 1 + 2 * FileSystemEntry.padding);
-    max_usage = (int)((TEXTURE_SIZE - 1) / textHeight) * (TEXTURE_SIZE - 2);
+    textBaseline = -textPaint.ascent() + FileSystemEntry.padding;
+    textHeight = (int) (textPaint.descent() - textPaint.ascent() + 1 + 2 * FileSystemEntry.padding);
+    max_usage = (int) ((TEXTURE_SIZE - 1) / textHeight) * (TEXTURE_SIZE - 2);
     FileSystemEntry.updateFonts(textSize);
   }
-  
+
   public RenderingThread(
       Context context,
       FileSystemState eventHandler) {
     updateFonts(context);
     this.context = context;
     this.eventHandler = eventHandler;
-    
+
     ByteBuffer pb = ByteBuffer.allocateDirect(MAX_INDEXES * SIZEOF_SHORT);
     pb.order(ByteOrder.nativeOrder());
     indicies = pb.asShortBuffer();
-    
+
     ByteBuffer tbb = ByteBuffer.allocateDirect(MAX_VERTEX * SIZEOF_FLOAT * 2);
     tbb.order(ByteOrder.nativeOrder());
     texCoords = tbb.asFloatBuffer();
@@ -160,59 +164,62 @@ public class RenderingThread extends AbstractRenderingThread {
     textTexCoords.position(0);
 
     int vertex = 0;
-    
+
     for (int i = 0; i < MAX_RECTS; i++) {
-      indicies.put(new short[] {
-          (short)(0 + vertex), (short)(1 + vertex), (short)(2 + vertex),
-          (short)(0 + vertex), (short)(2 + vertex), (short)(3 + vertex)});
-      
+      indicies.put(new short[]{
+          (short) (0 + vertex), (short) (1 + vertex), (short) (2 + vertex),
+          (short) (0 + vertex), (short) (2 + vertex), (short) (3 + vertex)});
+
       for (int x = 0; x < 4; x++) {
         texCoords.put(vertexData[x][0]);
         texCoords.put(vertexData[x][1]);
       }
       vertex += 4;
     }
-    
+
     indicies.position(0);
     texCoords.position(0);
   }
-  
+
   public void drawVertexes(
       float[] out, int pos, float x0, float y0, float x1, float y1) {
     out[pos + 0] = x0;
     out[pos + 1] = y0;
-    
+
     out[pos + 3] = x1;
     out[pos + 4] = y0;
-    
+
     out[pos + 6] = x1;
     out[pos + 7] = y1;
-    
+
     out[pos + 9] = x0;
     out[pos + 10] = y1;
   }
-  
+
   public class Square {
+
     private int nrects = 0;
     private final int texture_id;
     private final float[] vertexes = new float[MAX_VERTEX * 3];
-    
+
     Square(int resid) {
       texture_id = LoadTexture(getBitmap(resid));
     }
-    
+
     public final void draw(float x0, float y0, float x1, float y1) {
       int pos = nrects * 12;
       drawVertexes(vertexes, pos, x0, y0, x1, y1);
       nrects++;
-      
+
       if (nrects >= MAX_RECTS) {
         flush();
       }
     }
-    
+
     public void flush() {
-      if (nrects == 0) return;
+      if (nrects == 0) {
+        return;
+      }
       gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, texCoords);
       gl.glBindTexture(GL10.GL_TEXTURE_2D, texture_id);
       vertexBuffer.put(vertexes, 0, nrects * 12);
@@ -223,14 +230,15 @@ public class RenderingThread extends AbstractRenderingThread {
     }
   }
 
-    public class SmallSquare {
+  public class SmallSquare {
+
     private int nrects = 0;
     private final int texture_id;
     private final float[] vertexes = new float[MAX_VERTEX * 3];
     private final FloatBuffer texSmallCoordsBuffer;
     private final float[] texSmallCoords = new float[MAX_VERTEX * 2];
 
-    
+
     SmallSquare(int resid) {
       texture_id = LoadTexture(getBitmap(resid));
       ByteBuffer tbb = ByteBuffer.allocateDirect(
@@ -244,21 +252,23 @@ public class RenderingThread extends AbstractRenderingThread {
         texSmallCoords[i * 8 + 4] = 1;
       }
     }
-    
+
     public final void draw(float x0, float y0, float x1, float y1) {
       int pos = nrects * 12;
       drawVertexes(vertexes, pos, x0, y0, x1, y1);
       texSmallCoords[nrects * 8 + 5] = (y1 - y0) / 4;
       texSmallCoords[nrects * 8 + 7] = (y1 - y0) / 4;
       nrects++;
-      
+
       if (nrects >= MAX_RECTS) {
         flush();
       }
     }
-    
+
     public void flush() {
-      if (nrects == 0) return;
+      if (nrects == 0) {
+        return;
+      }
       texSmallCoordsBuffer.put(texSmallCoords, 0, nrects * 8);
       texSmallCoordsBuffer.position(0);
       gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, texSmallCoordsBuffer);
@@ -270,19 +280,20 @@ public class RenderingThread extends AbstractRenderingThread {
       nrects = 0;
     }
   }
-  
+
   public final class CursorFrame {
+
     private final int white;
-//    private final int black;
+    //    private final int black;
     private boolean dirty = false;
     private final float[] vertexes = new float[4 * 4 * 3];
 
-    
+
     CursorFrame() {
       white = LoadTexture(getBitmap(R.drawable.white_gradient));
 //      black = LoadTexture(getBitmap(R.drawable.black_gradient));
     }
-    
+
     public final void drawVertexes(int pos, float x0, float y0,
         float xoff1, float yoff1, float xoff2, float yoff2) {
       vertexes[pos + 0] = x0;
@@ -294,7 +305,7 @@ public class RenderingThread extends AbstractRenderingThread {
       vertexes[pos + 9] = x0 + xoff2;
       vertexes[pos + 10] = y0 + yoff2;
     }
-    
+
     public final void drawFrame(float x0, float y0, float x1, float y1) {
       drawVertexes(0, x0, y0, x1 - x0, 0, 0, 8);
       drawVertexes(12, x0, y1, 0, y0 - y1, 8, 0);
@@ -304,7 +315,9 @@ public class RenderingThread extends AbstractRenderingThread {
     }
 
     public void flush() {
-      if (!dirty) return;
+      if (!dirty) {
+        return;
+      }
       dirty = false;
       gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, texCoords);
       gl.glEnable(GL10.GL_BLEND);
@@ -325,13 +338,14 @@ public class RenderingThread extends AbstractRenderingThread {
     }
   }
 
-    public int newTextureId() {
+  public int newTextureId() {
     int[] ids = new int[1];
     gl.glGenTextures(1, ids, 0);
     return ids[0];
   }
-  
+
   private class BitmapMap implements Comparable<BitmapMap> {
+
     ArrayList<TextPixels> textPixelsArray = new ArrayList<TextPixels>();
     int textureid;
     int usage;
@@ -346,20 +360,21 @@ public class RenderingThread extends AbstractRenderingThread {
     float[] vertexes = new float[MAX_TEXT_VERTEXES * 3];
     int nrect;
     public boolean inuse;
-    
+
     BitmapMap() {
       bitmaps.add(this);
       textureid = newTextureId();
       edit();
     }
-    
-    
+
+
     Paint clearPaint;
+
     {
       clearPaint = new Paint();
       clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
-    
+
     public void edit() {
       if (editedBitmap == null) {
         editedBitmap = Bitmap.createBitmap(
@@ -376,7 +391,7 @@ public class RenderingThread extends AbstractRenderingThread {
       build_x = 1;
       build_y = 0;
     }
-    
+
     public void reset() {
       flush();
       for (TextPixels textPixels : textPixelsArray) {
@@ -385,12 +400,12 @@ public class RenderingThread extends AbstractRenderingThread {
       textPixelsArray.clear();
       edit();
     }
-    
+
     public void flushNoDeps() {
       if (bitmap != null) {
         buildTexture();
       }
-      
+
       gl.glBindTexture(GL10.GL_TEXTURE_2D, textureid);
       gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textTexCoords);
       gl.glEnable(GL10.GL_BLEND);
@@ -406,7 +421,7 @@ public class RenderingThread extends AbstractRenderingThread {
       gl.glDisable(GL10.GL_BLEND);
 
     }
-    
+
     public void flush() {
       smallSquare.flush();
       dirSquare.flush();
@@ -415,9 +430,11 @@ public class RenderingThread extends AbstractRenderingThread {
       cursorSquare.flush();
       flushNoDeps();
     }
-    
+
     public void buildTexture() {
-      if (build_x == x && build_y == y) return;
+      if (build_x == x && build_y == y) {
+        return;
+      }
       build_x = x;
       build_y = y;
       gl.glBindTexture(GL10.GL_TEXTURE_2D, textureid);
@@ -437,9 +454,11 @@ public class RenderingThread extends AbstractRenderingThread {
       canvas = null;
       inuse = true;
     }
-    
+
     public int score() {
-      if (bitmap != null) return Integer.MAX_VALUE;
+      if (bitmap != null) {
+        return Integer.MAX_VALUE;
+      }
       return usage;
     }
 
@@ -447,8 +466,12 @@ public class RenderingThread extends AbstractRenderingThread {
     public int compareTo(BitmapMap another) {
       int score = score();
       int another_score = another.score();
-      if (score < another_score) return -1;
-      if (score > another_score) return 1;
+      if (score < another_score) {
+        return -1;
+      }
+      if (score > another_score) {
+        return 1;
+      }
       return 0;
     }
 
@@ -458,16 +481,17 @@ public class RenderingThread extends AbstractRenderingThread {
       }
     }
   }
-  
+
   public BitmapMap getCurrentBitmapMap() {
     if (currentBitmapMap == null) {
       currentBitmapMap = new BitmapMap();
     }
-    if (currentBitmapMap == null)
+    if (currentBitmapMap == null) {
       throw new NullPointerException("no bitmap");
+    }
     return currentBitmapMap;
   }
-  
+
   public boolean hasReusableBitmap() {
     // Avoid to hijack texture we just draw into.
     // We still have references in TextPixels in current stack
@@ -476,14 +500,14 @@ public class RenderingThread extends AbstractRenderingThread {
     // cache anything this way.
     return !bitmaps.get(0).inuse;
   }
-  
+
   public BitmapMap getLeastUsedBitmap() {
     BitmapMap bitmapMap = bitmaps.remove(0);
     bitmaps.add(bitmapMap);
     bitmapMap.reset();
     return bitmapMap;
   }
-  
+
   public void nextBitmapMap() {
     currentBitmapMap.commit();
     if (bitmaps.size() >= 40 && hasReusableBitmap()) {
@@ -491,34 +515,35 @@ public class RenderingThread extends AbstractRenderingThread {
       currentBitmapMap = getLeastUsedBitmap();
       return;
     }
-    
+
 //    float bitmapUsage = bitmaps.get(0).last_usage / max_usage;
 //    if (bitmapUsage < 0.2 && hasReusableBitmap()) {
 ////      Log.d("diskusage", "get least used bitmap, usage = " + bitmapUsage);
 //      currentBitmapMap = getLeastUsedBitmap();
 //      return;
 //    }
-    
+
 //    Log.d("diskusage", "new bitmap");
     currentBitmapMap = new BitmapMap();
   }
-  
+
   static class TextPixels {
+
     private final String message;
     private final int offset;
     // Reminder of size after removing offset
     private int size;
-    
+
     private BitmapMap bitmapMap;
     private int mapX, mapY, mapSize;
     private TextPixels nextPixels;
-    
+
     TextPixels(String message) {
       this.message = message;
       this.size = 0;
       this.offset = 0;
     }
-    
+
     public void reset() {
       bitmapMap = null;
       nextPixels = null;
@@ -529,14 +554,14 @@ public class RenderingThread extends AbstractRenderingThread {
       this.message = message;
       this.size = size;
       this.offset = offset;
-      
+
     }
 
     public void draw(RenderingThread rt, float x0, float y0, int elementWidth) {
       int textHeight = rt.textHeight;
       float textBaseline = rt.textBaseline;
       if (size == 0) {
-        size = (int)(textPaint.measureText(message) + 1 + 2 * FileSystemEntry.padding);
+        size = (int) (textPaint.measureText(message) + 1 + 2 * FileSystemEntry.padding);
       }
       if (bitmapMap == null) {
         bitmapMap = rt.getCurrentBitmapMap();
@@ -550,14 +575,16 @@ public class RenderingThread extends AbstractRenderingThread {
         Canvas canvas = bitmapMap.canvas;
         canvas.save();
         canvas.clipRect(new Rect(mapX - 1, mapY,
-                                 mapX + drawing + 1, mapY + textHeight));
+            mapX + drawing + 1, mapY + textHeight));
         canvas.drawText(message, mapX - offset + padding, mapY + textBaseline, textPaint);
         canvas.restore();
         int newx = bitmapMap.x = mapX + drawing + 1;
         if (newx > TEXTURE_SIZE - 20) {
           bitmapMap.x = 1;
           int newy = bitmapMap.y = mapY + textHeight;
-          if (newy > (TEXTURE_SIZE - 1) - textHeight) rt.nextBitmapMap();
+          if (newy > (TEXTURE_SIZE - 1) - textHeight) {
+            rt.nextBitmapMap();
+          }
         }
         mapSize = drawing;
       }
@@ -566,18 +593,22 @@ public class RenderingThread extends AbstractRenderingThread {
       bitmapMap.usage += drawing;
       float tex_x0 = mapX * divTexSize;
       float tex_y0 = mapY * divTexSize;
-      float tex_x1 = (mapX + drawing) * divTexSize; 
+      float tex_x1 = (mapX + drawing) * divTexSize;
       float tex_y1 = (mapY + textHeight) * divTexSize;
       int nrect = bitmapMap.nrect;
       int off = nrect * 8;
       float[] texCoordsArray = bitmapMap.texCoords;
-      texCoordsArray[off + 0] = tex_x0; texCoordsArray[off + 1] = tex_y0;
-      texCoordsArray[off + 2] = tex_x1; texCoordsArray[off + 3] = tex_y0;
-      texCoordsArray[off + 4] = tex_x1; texCoordsArray[off + 5] = tex_y1;
-      texCoordsArray[off + 6] = tex_x0; texCoordsArray[off + 7] = tex_y1;
+      texCoordsArray[off + 0] = tex_x0;
+      texCoordsArray[off + 1] = tex_y0;
+      texCoordsArray[off + 2] = tex_x1;
+      texCoordsArray[off + 3] = tex_y0;
+      texCoordsArray[off + 4] = tex_x1;
+      texCoordsArray[off + 5] = tex_y1;
+      texCoordsArray[off + 6] = tex_x0;
+      texCoordsArray[off + 7] = tex_y1;
       rt.drawVertexes(bitmapMap.vertexes, nrect * 12,
-          x0, y0 - textBaseline, x0 + drawing, y0  + textHeight - rt.textBaseline);
-      
+          x0, y0 - textBaseline, x0 + drawing, y0 + textHeight - rt.textBaseline);
+
       int newrect = bitmapMap.nrect = nrect + 1;
       if (newrect >= MAX_TEXT_DRAWS_PER_TEXTURE) {
         bitmapMap.flush();
@@ -590,7 +621,7 @@ public class RenderingThread extends AbstractRenderingThread {
       }
     }
   }
-  
+
   public void flushTexture() {
     vertexBuffer.put(textureVertexes, 0, 12);
     vertexBuffer.position(0);
@@ -608,7 +639,7 @@ public class RenderingThread extends AbstractRenderingThread {
     drawable.draw(canvas);
     return bitmap;
   }
-  
+
   private int LoadTexture(Bitmap bitmap) {
     int texture_id = newTextureId();
 //    Bitmap bitmap = getBitmap(resid);
@@ -624,7 +655,7 @@ public class RenderingThread extends AbstractRenderingThread {
         GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
     return texture_id;
   }
-  
+
   private void LoadTextures(GL10 gl) {
     dirSquare = new Square(R.drawable.dirbg_new);
     fileSquare = new Square(R.drawable.filebg_new);
@@ -632,19 +663,19 @@ public class RenderingThread extends AbstractRenderingThread {
     smallSquare = new SmallSquare(R.drawable.small);
     cursorSquare = new CursorFrame();
   }
-  
+
   public void flush() {
     smallSquare.flush();
     dirSquare.flush();
     fileSquare.flush();
     specialSquare.flush();
     cursorSquare.flush();
-    
+
     for (BitmapMap bitmap : bitmaps) {
       bitmap.flushNoDeps();
     }
   }
-  
+
   @Override
   public boolean renderFrame(GL10 gl) {
 //    renderFrameStart();
@@ -656,7 +687,7 @@ public class RenderingThread extends AbstractRenderingThread {
     gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
     gl.glLoadIdentity();
     gl.glScalef(0.5f, 0.5f, 1.f);
-    
+
     boolean renderRequested = eventHandler.onDrawGPU(this);
     flush();
 //    Collections.sort(bitmaps);
@@ -674,7 +705,7 @@ public class RenderingThread extends AbstractRenderingThread {
     // Load textures
     LoadTextures(gl);
   }
-  
+
   public void releaseResources(GL10 gl) {
     Log.d("diskusage", "***** surface destroyed *****");
     for (BitmapMap bitmap : bitmaps) {
@@ -683,7 +714,7 @@ public class RenderingThread extends AbstractRenderingThread {
     bitmaps.clear();
     currentBitmapMap = null;
   }
-  
+
   @Override
   public void sizeChanged(GL10 gl, int width, int height) {
     Log.d("diskusage", "***** surface size changed       *****");
@@ -691,13 +722,12 @@ public class RenderingThread extends AbstractRenderingThread {
 //    FileSystemEntry.fontSize = 20; // FIXME
     eventHandler.layout(true, 0, 0, width, height, width, height);
     // Init projection
-    
+
     gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT,
         GL10.GL_FASTEST);
     gl.glViewport(0, 0, width, height);
     Log.d("diskusage", "updated viewport = " + width + "x" + height);
-    
-    
+
     gl.glMatrixMode(GL10.GL_PROJECTION);
     gl.glLoadIdentity();
     //  0  4  8 12
@@ -710,11 +740,10 @@ public class RenderingThread extends AbstractRenderingThread {
     matrix[15] = 1.f;
     matrix[12] = -1f;
     matrix[13] = 1f;
-    
-    gl.glLoadMatrixf(matrix, 0);
-    
-    gl.glMatrixMode(GL10.GL_MODELVIEW);
 
+    gl.glLoadMatrixf(matrix, 0);
+
+    gl.glMatrixMode(GL10.GL_MODELVIEW);
 
     gl.glEnable(GL10.GL_DITHER);
     gl.glEnable(GL10.GL_CULL_FACE);
@@ -722,7 +751,7 @@ public class RenderingThread extends AbstractRenderingThread {
 //    gl.glEnable(GL10.GL_DEPTH_TEST);
 //    gl.glDepthFunc(GL10.GL_LESS);
     gl.glFrontFace(GL10.GL_CW);
-    
+
     gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
     gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
     gl.glEnable(GL10.GL_TEXTURE_2D);

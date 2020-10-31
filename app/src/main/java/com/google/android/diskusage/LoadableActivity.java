@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -36,6 +33,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class LoadableActivity extends Activity {
+
   FileSystemPackage pkg_removed;
 
   @Override
@@ -49,13 +47,14 @@ public abstract class LoadableActivity extends Activity {
   abstract FileSystemSuperRoot scan() throws IOException, InterruptedException;
 
   static class PersistantActivityState {
+
     FileSystemSuperRoot root;
     AfterLoad afterLoad;
     MyProgressDialog loading;
   }
 
-    private static final Map<String, PersistantActivityState> persistantActivityState =
-            new TreeMap<>();
+  private static final Map<String, PersistantActivityState> persistantActivityState =
+      new TreeMap<>();
 
   public static void resetStoredStates() {
     persistantActivityState.clear();
@@ -63,22 +62,24 @@ public abstract class LoadableActivity extends Activity {
 
 
   // FIXME: use it wisely
- static boolean forceCleanup() {
-   boolean success = false;
-   for (PersistantActivityState state : persistantActivityState.values()) {
-     if (state.afterLoad == null && state.root != null) {
-       state.root = null;
-       success = true;
-     }
-   }
-   return success;
- }
+  static boolean forceCleanup() {
+    boolean success = false;
+    for (PersistantActivityState state : persistantActivityState.values()) {
+      if (state.afterLoad == null && state.root != null) {
+        state.root = null;
+        success = true;
+      }
+    }
+    return success;
+  }
 
   protected PersistantActivityState getPersistantState() {
     String key = getKey();
 
     PersistantActivityState state = persistantActivityState.get(key);
-    if (state != null) return state;
+    if (state != null) {
+      return state;
+    }
     state = new PersistantActivityState();
     persistantActivityState.put(key, state);
     return state;
@@ -115,7 +116,9 @@ public abstract class LoadableActivity extends Activity {
     thisLoading.setMessage(activity.getString(R.string.scaning_directories));
     thisLoading.show();
 
-    if (scanRunning) return;
+    if (scanRunning) {
+      return;
+    }
     final Handler handler = new Handler();
 
     new Thread(() -> {
@@ -134,7 +137,9 @@ public abstract class LoadableActivity extends Activity {
             }
             return;
           }
-          if (state.loading.isShowing()) state.loading.dismiss();
+          if (state.loading.isShowing()) {
+            state.loading.dismiss();
+          }
           state.loading = null;
           AfterLoad afterLoadCopy = state.afterLoad;
           state.afterLoad = null;
@@ -156,7 +161,9 @@ public abstract class LoadableActivity extends Activity {
         state.afterLoad = null;
         Log.d("DiskUsage", "out of memory!");
         handler.post(() -> {
-          if (state.loading == null) return;
+          if (state.loading == null) {
+            return;
+          }
           state.loading.dismiss();
           handleOutOfMemory(activity);
         });
@@ -172,11 +179,13 @@ public abstract class LoadableActivity extends Activity {
       state.afterLoad = null;
       Log.d("DiskUsage", "exception in scan!");
       handler.post(() -> {
-        if (state.loading == null) return;
+        if (state.loading == null) {
+          return;
+        }
         state.loading.dismiss();
         new AlertDialog.Builder(activity)
-        .setTitle(finalError)
-        .setOnCancelListener(dialog -> activity.finish()).create().show();
+            .setTitle(finalError)
+            .setOnCancelListener(dialog -> activity.finish()).create().show();
 
       });
     }).start();
@@ -186,7 +195,9 @@ public abstract class LoadableActivity extends Activity {
   protected void onPause() {
     PersistantActivityState state = getPersistantState();
     if (state.loading != null) {
-      if (state.loading.isShowing()) state.loading.dismiss();
+      if (state.loading.isShowing()) {
+        state.loading.dismiss();
+      }
       Log.d("diskusage", "removed progress dialog");
       state.loading = null;
     }
@@ -196,21 +207,22 @@ public abstract class LoadableActivity extends Activity {
   private void handleEmptySDCard(final LoadableActivity activity,
       final AfterLoad afterLoad) {
     new AlertDialog.Builder(activity)
-    .setTitle(activity.getString(R.string.empty_or_missing_sdcard))
-    .setPositiveButton(activity.getString(R.string.button_rescan), (dialog, which) -> {
-      if (afterLoad == null)
-        throw new RuntimeException("afterLoad is empty");
-      LoadFiles(activity, afterLoad, true);
-    })
-    .setOnCancelListener(dialog -> activity.finish()).create().show();
+        .setTitle(activity.getString(R.string.empty_or_missing_sdcard))
+        .setPositiveButton(activity.getString(R.string.button_rescan), (dialog, which) -> {
+          if (afterLoad == null) {
+            throw new RuntimeException("afterLoad is empty");
+          }
+          LoadFiles(activity, afterLoad, true);
+        })
+        .setOnCancelListener(dialog -> activity.finish()).create().show();
   }
 
   private static void handleOutOfMemory(final Activity activity) {
     try {
       // Can fail if the main window is already closed.
       new AlertDialog.Builder(activity)
-      .setTitle(activity.getString(R.string.out_of_memory))
-      .setOnCancelListener(dialog -> activity.finish()).create().show();
+          .setTitle(activity.getString(R.string.out_of_memory))
+          .setOnCancelListener(dialog -> activity.finish()).create().show();
     } catch (Throwable t) {
       Toast.makeText(
           activity, "DiskUsage is out of memory. Sorry.", Toast.LENGTH_SHORT).show();

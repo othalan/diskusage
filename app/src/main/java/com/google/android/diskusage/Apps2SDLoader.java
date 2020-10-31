@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -52,13 +49,14 @@ public class Apps2SDLoader {
 
 
   public FileSystemEntry[] load(final long blockSize) throws Throwable {
-    UsageStatsManager usageStatsManager = (UsageStatsManager) diskUsage.getSystemService(Context.USAGE_STATS_SERVICE);
+    UsageStatsManager usageStatsManager = (UsageStatsManager) diskUsage
+        .getSystemService(Context.USAGE_STATS_SERVICE);
 
-
-    final List<UsageStats> queryUsageStats=usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_YEARLY, 0 ,System.currentTimeMillis());
+    final List<UsageStats> queryUsageStats = usageStatsManager.queryUsageStats(
+        UsageStatsManager.INTERVAL_YEARLY, 0, System.currentTimeMillis());
     Log.d("diskusage", "stats size = " + queryUsageStats.size());
-    StorageStatsManager storageStatsManager = (StorageStatsManager) diskUsage.getSystemService(Context.STORAGE_STATS_SERVICE);
+    StorageStatsManager storageStatsManager = (StorageStatsManager) diskUsage
+        .getSystemService(Context.STORAGE_STATS_SERVICE);
     final ArrayList<FileSystemEntry> entries = new ArrayList<>();
     PackageManager packageManager = diskUsage.getApplicationContext().getPackageManager();
     final Set<String> packages = new HashSet<>();
@@ -88,23 +86,23 @@ public class Apps2SDLoader {
     };
     handler.post(progressUpdater);
 
-
     for (String pkg : packages) {
       Log.d("diskusage", "app: " + pkg);
       try {
-        ApplicationInfo metadata = packageManager.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
+        ApplicationInfo metadata = packageManager
+            .getApplicationInfo(pkg, PackageManager.GET_META_DATA);
         String appName = metadata.loadLabel(packageManager).toString();
         lastAppName = appName;
         StorageStats stats = storageStatsManager.queryStatsForPackage(
-                StorageManager.UUID_DEFAULT, pkg, android.os.Process.myUserHandle());
+            StorageManager.UUID_DEFAULT, pkg, android.os.Process.myUserHandle());
         Log.d("diskusage", "stats: " + stats.getAppBytes() + " " + stats.getDataBytes());
         FileSystemPackage p = new FileSystemPackage(
-                appName,
-                pkg,
-                stats.getAppBytes(),
-                stats.getDataBytes(),
-                stats.getCacheBytes(),
-                metadata.flags);
+            appName,
+            pkg,
+            stats.getAppBytes(),
+            stats.getDataBytes(),
+            stats.getCacheBytes(),
+            metadata.flags);
         p.applyFilter(blockSize);
         entries.add(p);
         numLoadedPackages++;
@@ -113,7 +111,7 @@ public class Apps2SDLoader {
       }
     }
 
-    FileSystemEntry[] result = entries.toArray(new FileSystemEntry[] {});
+    FileSystemEntry[] result = entries.toArray(new FileSystemEntry[]{});
     Arrays.sort(result, FileSystemEntry.COMPARE);
     handler.removeCallbacks(progressUpdater);
     return result;

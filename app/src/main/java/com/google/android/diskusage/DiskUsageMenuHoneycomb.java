@@ -13,24 +13,25 @@ import android.widget.SearchView.OnQueryTextListener;
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
 
 public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
+
   private SearchView searchView;
   private Drawable origSearchBackground;
 
   public DiskUsageMenuHoneycomb(DiskUsage diskusage) {
     super(diskusage);
   }
-  
+
   @Override
   public void onCreate() {
     ActionBar actionBar = diskusage.getActionBar();
     actionBar.setDisplayHomeAsUpEnabled(true);
   }
-  
+
   @Override
   public boolean readyToFinish() {
     return true;
   }
-  
+
   @Override
   public void wrapAndSetContentView(View view, FileSystemSuperRoot newRoot) {
     super.wrapAndSetContentView(view, newRoot);
@@ -42,7 +43,7 @@ public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
   public void setShowAsAction(MenuItem item) {
     item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
   }
-  
+
   @Override
   public boolean finishedSearch(FileSystemSuperRoot newRoot, String searchQuery) {
     boolean matched = super.finishedSearch(newRoot, searchQuery);
@@ -89,7 +90,7 @@ public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
     });
     return item;
   }
-  
+
   @Override
   public void onPrepareOptionsMenu(Menu menu) {
     super.onPrepareOptionsMenu(menu);
@@ -101,6 +102,6 @@ public class DiskUsageMenuHoneycomb extends DiskUsageMenu {
   public void searchRequest() {
     // FIXME: implement something?
     // TODO Auto-generated method stub
-    
+
   }
 }

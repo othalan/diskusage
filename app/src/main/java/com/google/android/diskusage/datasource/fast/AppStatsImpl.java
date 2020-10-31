@@ -7,6 +7,7 @@ import android.os.Build;
 import com.google.android.diskusage.datasource.AppStats;
 
 class AppStatsImpl implements AppStats {
+
   private final PackageStats packageStats;
 
   public AppStatsImpl(PackageStats packageStats) {
@@ -28,7 +29,7 @@ class AppStatsImpl implements AppStats {
     return packageStats.codeSize;
   }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalCacheSize() {
     return packageStats.externalCacheSize;
@@ -40,19 +41,19 @@ class AppStatsImpl implements AppStats {
     return packageStats.externalCodeSize;
   }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalDataSize() {
     return packageStats.externalDataSize;
   }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalMediaSize() {
     return packageStats.externalMediaSize;
   }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   public long getExternalObbSize() {
     return packageStats.externalObbSize;

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class PortableStreamProtoWriterImpl extends InputStream {
+
   interface CloseCallback {
+
     void onClose(PortableStreamProto proto);
   }
 

@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 
 public class PortableExceptionProtoImpl {
+
   public static PortableExceptionProto makeProto(Exception e) {
     PortableExceptionProto ex = new PortableExceptionProto();
     ex.class_ = e.getClass().getName();
@@ -53,6 +54,7 @@ public class PortableExceptionProtoImpl {
       throw new RuntimeException("Unexpected exception", e);
     }
   }
+
   public static void throwIOException(PortableExceptionProto ex) throws IOException {
     Exception e = PortableExceptionProtoImpl.create(ex);
     if (e == null) {

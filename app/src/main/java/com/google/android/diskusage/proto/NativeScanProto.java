@@ -7,6 +7,7 @@ public final class NativeScanProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile NativeScanProto[] _emptyArray;
+
   public static NativeScanProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -69,14 +70,14 @@ public final class NativeScanProto extends
     }
     if (this.stream != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(3, this.stream);
+          .computeMessageSize(3, this.stream);
     }
     return size;
   }
 
   @Override
   public NativeScanProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -114,7 +115,7 @@ public final class NativeScanProto extends
   }
 
   public static NativeScanProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new NativeScanProto().mergeFrom(input);
   }

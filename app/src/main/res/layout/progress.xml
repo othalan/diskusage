@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,39 +14,39 @@
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="match_parent">
-        <ProgressBar android:id="@+id/progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dip"
-            android:layout_marginBottom="1dip"
-            android:layout_marginLeft="10dip"
-            android:layout_marginRight="10dip"
-            android:layout_centerHorizontal="true" />
-        <TextView
-            android:id="@+id/progress_percent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="12dip"
-            android:layout_marginLeft="10dip"
-            android:layout_marginRight="10dip"
-            android:layout_alignParentLeft="true"
-            android:inputType="textNoSuggestions"
-            android:layout_below="@id/progress"
-        />
-        <TextView
-            android:id="@+id/progress_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="12dip"
-            android:layout_marginLeft="50dip"
-            android:layout_marginRight="15dip"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/progress"
-            android:maxLines="1"
-            android:gravity="left"
-            android:inputType="textNoSuggestions"
-            android:ellipsize="none"
-        />
+  android:layout_width="wrap_content"
+  android:layout_height="match_parent">
+  <ProgressBar
+    android:id="@+id/progress"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dip"
+    android:layout_marginBottom="1dip"
+    android:layout_marginLeft="10dip"
+    android:layout_marginRight="10dip"
+    android:layout_centerHorizontal="true" />
+  <TextView
+    android:id="@+id/progress_percent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="12dip"
+    android:layout_marginLeft="10dip"
+    android:layout_marginRight="10dip"
+    android:layout_alignParentLeft="true"
+    android:inputType="textNoSuggestions"
+    android:layout_below="@id/progress" />
+  <TextView
+    android:id="@+id/progress_details"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="12dip"
+    android:layout_marginLeft="50dip"
+    android:layout_marginRight="15dip"
+    android:layout_alignParentLeft="true"
+    android:layout_below="@id/progress"
+    android:maxLines="1"
+    android:gravity="left"
+    android:inputType="textNoSuggestions"
+    android:ellipsize="none" />
 </RelativeLayout>

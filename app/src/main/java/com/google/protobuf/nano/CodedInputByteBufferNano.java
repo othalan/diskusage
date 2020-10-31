@@ -34,17 +34,17 @@ import java.io.IOException;
 
 /**
  * Reads and decodes protocol message fields.
- *
- * This class contains two kinds of methods:  methods that read specific
- * protocol message constructs and field types (e.g. {@link #readTag()} and
- * {@link #readInt32()}) and methods that read low-level values (e.g.
- * {@link #readRawVarint32()} and {@link #readRawBytes}).  If you are reading
- * encoded protocol messages, you should use the former methods, but if you are
- * reading some other format of your own design, use the latter.
+ * <p>
+ * This class contains two kinds of methods:  methods that read specific protocol message constructs
+ * and field types (e.g. {@link #readTag()} and {@link #readInt32()}) and methods that read
+ * low-level values (e.g. {@link #readRawVarint32()} and {@link #readRawBytes}).  If you are reading
+ * encoded protocol messages, you should use the former methods, but if you are reading some other
+ * format of your own design, use the latter.
  *
  * @author kenton@google.com Kenton Varda
  */
 public final class CodedInputByteBufferNano {
+
   /**
    * Create a new CodedInputStream wrapping the given byte array.
    */
@@ -56,16 +56,16 @@ public final class CodedInputByteBufferNano {
    * Create a new CodedInputStream wrapping the given byte array slice.
    */
   public static CodedInputByteBufferNano newInstance(final byte[] buf, final int off,
-                                             final int len) {
+      final int len) {
     return new CodedInputByteBufferNano(buf, off, len);
   }
 
   // -----------------------------------------------------------------
 
   /**
-   * Attempt to read a field tag, returning zero if we have reached EOF.
-   * Protocol message parsers use this to read tags, since a protocol message
-   * may legally end wherever a tag occurs, and zero is not a valid tag number.
+   * Attempt to read a field tag, returning zero if we have reached EOF. Protocol message parsers
+   * use this to read tags, since a protocol message may legally end wherever a tag occurs, and zero
+   * is not a valid tag number.
    */
   public int readTag() throws IOException {
     if (isAtEnd()) {
@@ -82,15 +82,13 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Verifies that the last call to readTag() returned the given tag value.
-   * This is used to verify that a nested group ended with the correct
-   * end tag.
+   * Verifies that the last call to readTag() returned the given tag value. This is used to verify
+   * that a nested group ended with the correct end tag.
    *
-   * @throws InvalidProtocolBufferNanoException {@code value} does not match the
-   *                                        last tag.
+   * @throws InvalidProtocolBufferNanoException {@code value} does not match the last tag.
    */
   public void checkLastTagWas(final int value)
-                              throws InvalidProtocolBufferNanoException {
+      throws InvalidProtocolBufferNanoException {
     if (lastTag != value) {
       throw InvalidProtocolBufferNanoException.invalidEndTag();
     }
@@ -99,8 +97,8 @@ public final class CodedInputByteBufferNano {
   /**
    * Reads and discards a single field, given its tag value.
    *
-   * @return {@code false} if the tag is an endgroup tag, in which case
-   *         nothing is skipped.  Otherwise, returns {@code true}.
+   * @return {@code false} if the tag is an endgroup tag, in which case nothing is skipped.
+   * Otherwise, returns {@code true}.
    */
   public boolean skipField(final int tag) throws IOException {
     switch (WireFormatNano.getTagWireType(tag)) {
@@ -116,8 +114,8 @@ public final class CodedInputByteBufferNano {
       case WireFormatNano.WIRETYPE_START_GROUP:
         skipMessage();
         checkLastTagWas(
-          WireFormatNano.makeTag(WireFormatNano.getTagFieldNumber(tag),
-                             WireFormatNano.WIRETYPE_END_GROUP));
+            WireFormatNano.makeTag(WireFormatNano.getTagFieldNumber(tag),
+                WireFormatNano.WIRETYPE_END_GROUP));
         return true;
       case WireFormatNano.WIRETYPE_END_GROUP:
         return false;
@@ -130,8 +128,8 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Reads and discards an entire message.  This will read either until EOF
-   * or until an endgroup tag, whichever comes first.
+   * Reads and discards an entire message.  This will read either until EOF or until an endgroup
+   * tag, whichever comes first.
    */
   public void skipMessage() throws IOException {
     while (true) {
@@ -144,47 +142,65 @@ public final class CodedInputByteBufferNano {
 
   // -----------------------------------------------------------------
 
-  /** Read a {@code double} field value from the stream. */
+  /**
+   * Read a {@code double} field value from the stream.
+   */
   public double readDouble() throws IOException {
     return Double.longBitsToDouble(readRawLittleEndian64());
   }
 
-  /** Read a {@code float} field value from the stream. */
+  /**
+   * Read a {@code float} field value from the stream.
+   */
   public float readFloat() throws IOException {
     return Float.intBitsToFloat(readRawLittleEndian32());
   }
 
-  /** Read a {@code uint64} field value from the stream. */
+  /**
+   * Read a {@code uint64} field value from the stream.
+   */
   public long readUInt64() throws IOException {
     return readRawVarint64();
   }
 
-  /** Read an {@code int64} field value from the stream. */
+  /**
+   * Read an {@code int64} field value from the stream.
+   */
   public long readInt64() throws IOException {
     return readRawVarint64();
   }
 
-  /** Read an {@code int32} field value from the stream. */
+  /**
+   * Read an {@code int32} field value from the stream.
+   */
   public int readInt32() throws IOException {
     return readRawVarint32();
   }
 
-  /** Read a {@code fixed64} field value from the stream. */
+  /**
+   * Read a {@code fixed64} field value from the stream.
+   */
   public long readFixed64() throws IOException {
     return readRawLittleEndian64();
   }
 
-  /** Read a {@code fixed32} field value from the stream. */
+  /**
+   * Read a {@code fixed32} field value from the stream.
+   */
   public int readFixed32() throws IOException {
     return readRawLittleEndian32();
   }
 
-  /** Read a {@code bool} field value from the stream. */
+  /**
+   * Read a {@code bool} field value from the stream.
+   */
   public boolean readBool() throws IOException {
     return readRawVarint32() != 0;
   }
 
-  /** Read a {@code string} field value from the stream. */
+  /**
+   * Read a {@code string} field value from the stream.
+   */
   public String readString() throws IOException {
     final int size = readRawVarint32();
     if (size <= (bufferSize - bufferPos) && size > 0) {
@@ -199,7 +215,9 @@ public final class CodedInputByteBufferNano {
     }
   }
 
-  /** Read a {@code group} field value from the stream. */
+  /**
+   * Read a {@code group} field value from the stream.
+   */
   public void readGroup(final MessageNano msg, final int fieldNumber)
       throws IOException {
     if (recursionDepth >= recursionLimit) {
@@ -208,7 +226,7 @@ public final class CodedInputByteBufferNano {
     ++recursionDepth;
     msg.mergeFrom(this);
     checkLastTagWas(
-      WireFormatNano.makeTag(fieldNumber, WireFormatNano.WIRETYPE_END_GROUP));
+        WireFormatNano.makeTag(fieldNumber, WireFormatNano.WIRETYPE_END_GROUP));
     --recursionDepth;
   }
 
@@ -226,7 +244,9 @@ public final class CodedInputByteBufferNano {
     popLimit(oldLimit);
   }
 
-  /** Read a {@code bytes} field value from the stream. */
+  /**
+   * Read a {@code bytes} field value from the stream.
+   */
   public byte[] readBytes() throws IOException {
     final int size = readRawVarint32();
     if (size <= (bufferSize - bufferPos) && size > 0) {
@@ -244,35 +264,45 @@ public final class CodedInputByteBufferNano {
     }
   }
 
-  /** Read a {@code uint32} field value from the stream. */
+  /**
+   * Read a {@code uint32} field value from the stream.
+   */
   public int readUInt32() throws IOException {
     return readRawVarint32();
   }
 
   /**
-   * Read an enum field value from the stream.  Caller is responsible
-   * for converting the numeric value to an actual enum.
+   * Read an enum field value from the stream.  Caller is responsible for converting the numeric
+   * value to an actual enum.
    */
   public int readEnum() throws IOException {
     return readRawVarint32();
   }
 
-  /** Read an {@code sfixed32} field value from the stream. */
+  /**
+   * Read an {@code sfixed32} field value from the stream.
+   */
   public int readSFixed32() throws IOException {
     return readRawLittleEndian32();
   }
 
-  /** Read an {@code sfixed64} field value from the stream. */
+  /**
+   * Read an {@code sfixed64} field value from the stream.
+   */
   public long readSFixed64() throws IOException {
     return readRawLittleEndian64();
   }
 
-  /** Read an {@code sint32} field value from the stream. */
+  /**
+   * Read an {@code sint32} field value from the stream.
+   */
   public int readSInt32() throws IOException {
     return decodeZigZag32(readRawVarint32());
   }
 
-  /** Read an {@code sint64} field value from the stream. */
+  /**
+   * Read an {@code sint64} field value from the stream.
+   */
   public long readSInt64() throws IOException {
     return decodeZigZag64(readRawVarint64());
   }
@@ -280,8 +310,7 @@ public final class CodedInputByteBufferNano {
   // =================================================================
 
   /**
-   * Read a raw Varint from the stream.  If larger than 32 bits, discard the
-   * upper bits.
+   * Read a raw Varint from the stream.  If larger than 32 bits, discard the upper bits.
    */
   public int readRawVarint32() throws IOException {
     byte tmp = readRawByte();
@@ -317,13 +346,15 @@ public final class CodedInputByteBufferNano {
     return result;
   }
 
-  /** Read a raw Varint from the stream. */
+  /**
+   * Read a raw Varint from the stream.
+   */
   public long readRawVarint64() throws IOException {
     int shift = 0;
     long result = 0;
     while (shift < 64) {
       final byte b = readRawByte();
-      result |= (long)(b & 0x7F) << shift;
+      result |= (long) (b & 0x7F) << shift;
       if ((b & 0x80) == 0) {
         return result;
       }
@@ -332,19 +363,23 @@ public final class CodedInputByteBufferNano {
     throw InvalidProtocolBufferNanoException.malformedVarint();
   }
 
-  /** Read a 32-bit little-endian integer from the stream. */
+  /**
+   * Read a 32-bit little-endian integer from the stream.
+   */
   public int readRawLittleEndian32() throws IOException {
     final byte b1 = readRawByte();
     final byte b2 = readRawByte();
     final byte b3 = readRawByte();
     final byte b4 = readRawByte();
-    return ((b1 & 0xff)      ) |
-           ((b2 & 0xff) <<  8) |
-           ((b3 & 0xff) << 16) |
-           ((b4 & 0xff) << 24);
+    return ((b1 & 0xff)) |
+        ((b2 & 0xff) << 8) |
+        ((b3 & 0xff) << 16) |
+        ((b4 & 0xff) << 24);
   }
 
-  /** Read a 64-bit little-endian integer from the stream. */
+  /**
+   * Read a 64-bit little-endian integer from the stream.
+   */
   public long readRawLittleEndian64() throws IOException {
     final byte b1 = readRawByte();
     final byte b2 = readRawByte();
@@ -354,24 +389,23 @@ public final class CodedInputByteBufferNano {
     final byte b6 = readRawByte();
     final byte b7 = readRawByte();
     final byte b8 = readRawByte();
-    return (((long)b1 & 0xff)      ) |
-           (((long)b2 & 0xff) <<  8) |
-           (((long)b3 & 0xff) << 16) |
-           (((long)b4 & 0xff) << 24) |
-           (((long)b5 & 0xff) << 32) |
-           (((long)b6 & 0xff) << 40) |
-           (((long)b7 & 0xff) << 48) |
-           (((long)b8 & 0xff) << 56);
+    return (((long) b1 & 0xff)) |
+        (((long) b2 & 0xff) << 8) |
+        (((long) b3 & 0xff) << 16) |
+        (((long) b4 & 0xff) << 24) |
+        (((long) b5 & 0xff) << 32) |
+        (((long) b6 & 0xff) << 40) |
+        (((long) b7 & 0xff) << 48) |
+        (((long) b8 & 0xff) << 56);
   }
 
   /**
-   * Decode a ZigZag-encoded 32-bit value.  ZigZag encodes signed integers
-   * into values that can be efficiently encoded with varint.  (Otherwise,
-   * negative values must be sign-extended to 64 bits to be varint encoded,
-   * thus always taking 10 bytes on the wire.)
+   * Decode a ZigZag-encoded 32-bit value.  ZigZag encodes signed integers into values that can be
+   * efficiently encoded with varint.  (Otherwise, negative values must be sign-extended to 64 bits
+   * to be varint encoded, thus always taking 10 bytes on the wire.)
    *
-   * @param n An unsigned 32-bit integer, stored in a signed int because
-   *          Java has no explicit unsigned support.
+   * @param n An unsigned 32-bit integer, stored in a signed int because Java has no explicit
+   *          unsigned support.
    * @return A signed 32-bit integer.
    */
   public static int decodeZigZag32(final int n) {
@@ -379,13 +413,12 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Decode a ZigZag-encoded 64-bit value.  ZigZag encodes signed integers
-   * into values that can be efficiently encoded with varint.  (Otherwise,
-   * negative values must be sign-extended to 64 bits to be varint encoded,
-   * thus always taking 10 bytes on the wire.)
+   * Decode a ZigZag-encoded 64-bit value.  ZigZag encodes signed integers into values that can be
+   * efficiently encoded with varint.  (Otherwise, negative values must be sign-extended to 64 bits
+   * to be varint encoded, thus always taking 10 bytes on the wire.)
    *
-   * @param n An unsigned 64-bit integer, stored in a signed int because
-   *          Java has no explicit unsigned support.
+   * @param n An unsigned 64-bit integer, stored in a signed int because Java has no explicit
+   *          unsigned support.
    * @return A signed 64-bit integer.
    */
   public static long decodeZigZag64(final long n) {
@@ -401,14 +434,20 @@ public final class CodedInputByteBufferNano {
   private int bufferPos;
   private int lastTag;
 
-  /** The absolute position of the end of the current message. */
+  /**
+   * The absolute position of the end of the current message.
+   */
   private int currentLimit = Integer.MAX_VALUE;
 
-  /** See setRecursionLimit() */
+  /**
+   * See setRecursionLimit()
+   */
   private int recursionDepth;
   private int recursionLimit = DEFAULT_RECURSION_LIMIT;
 
-  /** See setSizeLimit() */
+  /**
+   * See setSizeLimit()
+   */
   private int sizeLimit = DEFAULT_SIZE_LIMIT;
 
   private static final int DEFAULT_RECURSION_LIMIT = 64;
@@ -422,16 +461,16 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Set the maximum message recursion depth.  In order to prevent malicious
-   * messages from causing stack overflows, {@code CodedInputStream} limits
-   * how deeply messages may be nested.  The default limit is 64.
+   * Set the maximum message recursion depth.  In order to prevent malicious messages from causing
+   * stack overflows, {@code CodedInputStream} limits how deeply messages may be nested.  The
+   * default limit is 64.
    *
    * @return the old limit.
    */
   public int setRecursionLimit(final int limit) {
     if (limit < 0) {
       throw new IllegalArgumentException(
-        "Recursion limit cannot be negative: " + limit);
+          "Recursion limit cannot be negative: " + limit);
     }
     final int oldLimit = recursionLimit;
     recursionLimit = limit;
@@ -439,24 +478,21 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Set the maximum message size.  In order to prevent malicious
-   * messages from exhausting memory or causing integer overflows,
-   * {@code CodedInputStream} limits how large a message may be.
-   * The default limit is 64MB.  You should set this limit as small
-   * as you can without harming your app's functionality.  Note that
-   * size limits only apply when reading from an {@code InputStream}, not
-   * when constructed around a raw byte array.
+   * Set the maximum message size.  In order to prevent malicious messages from exhausting memory or
+   * causing integer overflows, {@code CodedInputStream} limits how large a message may be. The
+   * default limit is 64MB.  You should set this limit as small as you can without harming your
+   * app's functionality.  Note that size limits only apply when reading from an {@code
+   * InputStream}, not when constructed around a raw byte array.
    * <p>
-   * If you want to read several messages from a single CodedInputStream, you
-   * could call {@link #resetSizeCounter()} after each one to avoid hitting the
-   * size limit.
+   * If you want to read several messages from a single CodedInputStream, you could call {@link
+   * #resetSizeCounter()} after each one to avoid hitting the size limit.
    *
    * @return the old limit.
    */
   public int setSizeLimit(final int limit) {
     if (limit < 0) {
       throw new IllegalArgumentException(
-        "Size limit cannot be negative: " + limit);
+          "Size limit cannot be negative: " + limit);
     }
     final int oldLimit = sizeLimit;
     sizeLimit = limit;
@@ -470,8 +506,8 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Sets {@code currentLimit} to (current position) + {@code byteLimit}.  This
-   * is called when descending into a length-delimited embedded message.
+   * Sets {@code currentLimit} to (current position) + {@code byteLimit}.  This is called when
+   * descending into a length-delimited embedded message.
    *
    * @return the old limit.
    */
@@ -514,8 +550,8 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Returns the number of bytes to be read before the current limit.
-   * If no limit is set, returns -1.
+   * Returns the number of bytes to be read before the current limit. If no limit is set, returns
+   * -1.
    */
   public int getBytesUntilLimit() {
     if (currentLimit == Integer.MAX_VALUE) {
@@ -527,9 +563,9 @@ public final class CodedInputByteBufferNano {
   }
 
   /**
-   * Returns true if the stream has reached the end of the input.  This is the
-   * case if either the end of the underlying input source has been reached or
-   * if the stream has reached a limit created using {@link #pushLimit(int)}.
+   * Returns true if the stream has reached the end of the input.  This is the case if either the
+   * end of the underlying input source has been reached or if the stream has reached a limit
+   * created using {@link #pushLimit(int)}.
    */
   public boolean isAtEnd() {
     return bufferPos == bufferSize;
@@ -565,7 +601,7 @@ public final class CodedInputByteBufferNano {
   public void rewindToPosition(int position) {
     if (position > bufferPos - bufferStart) {
       throw new IllegalArgumentException(
-              "Position " + position + " is beyond current " + (bufferPos - bufferStart));
+          "Position " + position + " is beyond current " + (bufferPos - bufferStart));
     }
     if (position < 0) {
       throw new IllegalArgumentException("Bad position " + position);
@@ -576,8 +612,8 @@ public final class CodedInputByteBufferNano {
   /**
    * Read one byte from the input.
    *
-   * @throws InvalidProtocolBufferNanoException The end of the stream or the current
-   *                                        limit was reached.
+   * @throws InvalidProtocolBufferNanoException The end of the stream or the current limit was
+   *                                            reached.
    */
   public byte readRawByte() throws IOException {
     if (bufferPos == bufferSize) {
@@ -589,8 +625,8 @@ public final class CodedInputByteBufferNano {
   /**
    * Read a fixed size of bytes from the input.
    *
-   * @throws InvalidProtocolBufferNanoException The end of the stream or the current
-   *                                        limit was reached.
+   * @throws InvalidProtocolBufferNanoException The end of the stream or the current limit was
+   *                                            reached.
    */
   public byte[] readRawBytes(final int size) throws IOException {
     if (size < 0) {
@@ -618,8 +654,8 @@ public final class CodedInputByteBufferNano {
   /**
    * Reads and discards {@code size} bytes.
    *
-   * @throws InvalidProtocolBufferNanoException The end of the stream or the current
-   *                                        limit was reached.
+   * @throws InvalidProtocolBufferNanoException The end of the stream or the current limit was
+   *                                            reached.
    */
   public void skipRawBytes(final int size) throws IOException {
     if (size < 0) {
@@ -645,39 +681,39 @@ public final class CodedInputByteBufferNano {
   Object readPrimitiveField(int type) throws IOException {
     switch (type) {
       case InternalNano.TYPE_DOUBLE:
-          return readDouble();
+        return readDouble();
       case InternalNano.TYPE_FLOAT:
-          return readFloat();
+        return readFloat();
       case InternalNano.TYPE_INT64:
-          return readInt64();
+        return readInt64();
       case InternalNano.TYPE_UINT64:
-          return readUInt64();
+        return readUInt64();
       case InternalNano.TYPE_INT32:
-          return readInt32();
+        return readInt32();
       case InternalNano.TYPE_FIXED64:
-          return readFixed64();
+        return readFixed64();
       case InternalNano.TYPE_FIXED32:
-          return readFixed32();
+        return readFixed32();
       case InternalNano.TYPE_BOOL:
-          return readBool();
+        return readBool();
       case InternalNano.TYPE_STRING:
-          return readString();
+        return readString();
       case InternalNano.TYPE_BYTES:
-          return readBytes();
+        return readBytes();
       case InternalNano.TYPE_UINT32:
-          return readUInt32();
+        return readUInt32();
       case InternalNano.TYPE_ENUM:
-          return readEnum();
+        return readEnum();
       case InternalNano.TYPE_SFIXED32:
-          return readSFixed32();
+        return readSFixed32();
       case InternalNano.TYPE_SFIXED64:
-          return readSFixed64();
+        return readSFixed64();
       case InternalNano.TYPE_SINT32:
-          return readSInt32();
+        return readSInt32();
       case InternalNano.TYPE_SINT64:
-          return readSInt64();
+        return readSInt64();
       default:
-          throw new IllegalArgumentException("Unknown type " + type);
+        throw new IllegalArgumentException("Unknown type " + type);
     }
   }
 }

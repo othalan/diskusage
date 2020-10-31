@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class PortableStreamProtoReaderImpl extends InputStream {
+
   private final PortableStreamProto proto;
   private final ByteArrayInputStream is;
 

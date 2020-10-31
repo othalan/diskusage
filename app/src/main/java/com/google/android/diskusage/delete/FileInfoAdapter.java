@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage.delete;
@@ -37,6 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class FileInfoAdapter extends BaseAdapter {
+
   private int count;
   private final ArrayList<Entry> entries = new ArrayList<>();
   private boolean finished = false;
@@ -44,13 +42,13 @@ public class FileInfoAdapter extends BaseAdapter {
 
   private final String deletePath;
   private String base;
-  
+
   private final ArrayList<String> workingSet = new ArrayList<>();
   private String currentDir = "";
   TextView summary;
   long totalSize;
   Context context;
-  
+
   public FileInfoAdapter(Context context, String deletePath,
       int count, TextView summary) {
     this.context = context;
@@ -58,45 +56,49 @@ public class FileInfoAdapter extends BaseAdapter {
     this.deletePath = deletePath;
     this.summary = summary;
   }
-  
+
   public static void setMessage(
       Context context, TextView textView, int numfiles, String sizeString) {
     String text = context.getString(
         R.string.delete_summary, numfiles, sizeString);
     textView.setText(text);
   }
-  
+
   static class Entry {
+
     String size;
     String name;
-    
+
     Entry(String size, String name) {
       this.size = size;
       this.name = name;
     }
   }
-  
+
   Entry overflow = new Entry("", ".             .             .             .             .");
-  
+
   Entry getEntry(int pos) {
     if (pos >= entries.size()) {
       return overflow;
     }
     return entries.get(pos);
   }
-  
-  Comparator<String> reverseCaseInsensitiveOrder = (object1, object2) -> object2.compareToIgnoreCase(object1);
-  
+
+  Comparator<String> reverseCaseInsensitiveOrder = (object1, object2) -> object2
+      .compareToIgnoreCase(object1);
+
   private void prepareRoots() {
     base = new File(deletePath).getParent();
     File entity = new File(deletePath);
     String name = entity.getName();
     workingSet.add(name);
   }
-  
+
   private boolean loadOne(ArrayList<Entry> newEntries) {
-    if (base == null) prepareRoots();
-    
+    if (base == null) {
+      prepareRoots();
+    }
+
     while (true) {
       if (workingSet.isEmpty()) {
 //        finished = true;
@@ -133,8 +135,10 @@ public class FileInfoAdapter extends BaseAdapter {
       Set<String> dirs = new TreeSet<>(reverseCaseInsensitiveOrder);
       Set<String> files = new TreeSet<>(reverseCaseInsensitiveOrder);
 
-      if (entries == null) continue;
-      
+      if (entries == null) {
+        continue;
+      }
+
       for (File entity : entries) {
         String name = entity.getName();
         if (entity.isFile()) {
@@ -158,7 +162,7 @@ public class FileInfoAdapter extends BaseAdapter {
   public int getCount() {
     return Math.max(count, entries.size() + (finished ? 0 : 1));
   }
-  
+
   @Override
   public int getViewTypeCount() {
     return 2;
@@ -168,11 +172,11 @@ public class FileInfoAdapter extends BaseAdapter {
   public Object getItem(int position) {
     return getEntry(position);
   }
-  
+
   @Override
   public int getItemViewType(int position) {
     Entry entry = getEntry(position);
-    
+
     return (entry.size == null) ? 1 : 0;
   }
 
@@ -180,14 +184,17 @@ public class FileInfoAdapter extends BaseAdapter {
   public long getItemId(int position) {
     return position;
   }
-  
+
   public boolean running = false;
-  
+
   class LoaderTask extends AsyncTask<Integer, Void, ArrayList<Entry>> {
+
     int currentPos;
+
     public LoaderTask(int currentPos) {
       this.currentPos = currentPos;
     }
+
     @Override
     protected ArrayList<Entry> doInBackground(Integer... params) {
       int toLoad = params[0];
@@ -199,7 +206,7 @@ public class FileInfoAdapter extends BaseAdapter {
       }
       return newEntries;
     }
-    
+
     @Override
     protected void onPostExecute(ArrayList<Entry> newEntries) {
       running = false;
@@ -211,7 +218,7 @@ public class FileInfoAdapter extends BaseAdapter {
       } else {
         entries.addAll(newEntries);
         notifyDataSetChanged();
-        
+
         int toLoad = maxPos + 200 - entries.size();
         if (toLoad > 0) {
           running = true;
@@ -221,14 +228,16 @@ public class FileInfoAdapter extends BaseAdapter {
     }
   }
 
-    private int maxPos;
-  
+  private int maxPos;
+
   @Override
   public View getView(int position, View view, ViewGroup parent) {
 
     if (!finished) {
       if (running) {
-        if (position > maxPos) maxPos = position;
+        if (position > maxPos) {
+          maxPos = position;
+        }
       } else {
         int toLoad = position + 200 - entries.size();
         if (toLoad > 0) {
@@ -238,7 +247,7 @@ public class FileInfoAdapter extends BaseAdapter {
       }
     }
     Entry entry = getEntry(position);
-    
+
     LayoutInflater inflater = this.inflater;
     if (inflater == null) {
       inflater = this.inflater = (LayoutInflater) parent.getContext().getSystemService(
@@ -261,10 +270,10 @@ public class FileInfoAdapter extends BaseAdapter {
       nameView.setText(entry.name);
       sizeView.setText(entry.size);
     }
-    
+
     return view;
   }
-  
+
   @Override
   public boolean areAllItemsEnabled() {
     return false;
@@ -274,7 +283,7 @@ public class FileInfoAdapter extends BaseAdapter {
   public boolean isEnabled(int position) {
     return false;
   }
-  
+
   public boolean hasStableIds() {
     return true;
   }

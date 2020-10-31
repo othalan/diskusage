@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DebugDataSource extends DataSource {
+
   private final Dump dump;
   private final DataSource delegate;
 
@@ -118,9 +119,9 @@ public class DebugDataSource extends DataSource {
       AppStatsProto stats = proto.stats;
       callback.onGetStatsCompleted(
           stats.hasAppStats
-          ? new AppStatsProtoImpl(stats, dump.androidVersion)
-          : null,
-              stats.succeeded);
+              ? new AppStatsProtoImpl(stats, dump.androidVersion)
+              : null,
+          stats.succeeded);
       return;
     }
 
@@ -132,7 +133,7 @@ public class DebugDataSource extends DataSource {
           callback.onGetStatsCompleted(
               stats.hasAppStats ? new AppStatsProtoImpl(
                   stats, dump.androidVersion) : null,
-                  stats.succeeded);
+              stats.succeeded);
           stats.callbackChildFinished = true;
         });
   }
@@ -150,11 +151,11 @@ public class DebugDataSource extends DataSource {
     if (emptyPos == -1) {
       StatFsProto[] old = dump.statFs;
       dump.statFs = new StatFsProto[old.length * 2 + 3];
-      System.arraycopy(old,  0, dump.statFs, 0, old.length);
+      System.arraycopy(old, 0, dump.statFs, 0, old.length);
       emptyPos = old.length;
     }
     StatFsProto proto = dump.statFs[emptyPos] = StatFsSourceProtoImpl.makeProto(
-            mountPoint, delegate.statFs(mountPoint));
+        mountPoint, delegate.statFs(mountPoint));
     return new StatFsSourceProtoImpl(proto);
   }
 
@@ -225,7 +226,7 @@ public class DebugDataSource extends DataSource {
     if (emptyPos == -1) {
       NativeScanProto[] old = dump.nativeScan;
       dump.nativeScan = new NativeScanProto[old.length * 2 + 3];
-      System.arraycopy(old,  0, dump.nativeScan, 0, old.length);
+      System.arraycopy(old, 0, dump.nativeScan, 0, old.length);
       emptyPos = old.length;
     }
     final NativeScanProto proto = dump.nativeScan[emptyPos] = new NativeScanProto();
@@ -245,7 +246,6 @@ public class DebugDataSource extends DataSource {
     if (dump.proc != null) {
       return PortableStreamProtoReaderImpl.create(dump.proc);
     }
-
 
     return PortableStreamProtoWriterImpl.create(delegate.getProc(), proto -> dump.proc = proto);
   }
@@ -270,12 +270,12 @@ public class DebugDataSource extends DataSource {
     StreamCopy.copyStream(is, os);
     Intent emailIntent = new Intent(Intent.ACTION_SEND);
     emailIntent.setType("message/rfc822");
-    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"ivan.volosyuk+diskusage@gmail.com"});
+    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ivan.volosyuk+diskusage@gmail.com"});
     emailIntent.putExtra(Intent.EXTRA_SUBJECT, "DiskUsage bugreport");
     emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(dumpFile));
     emailIntent.putExtra(Intent.EXTRA_TEXT,
         "Please add some description of a problem\n" +
-        "The attached dump may contain file names and install application names\n");
+            "The attached dump may contain file names and install application names\n");
     context.startActivity(Intent.createChooser(
         emailIntent, "Send bugreport email..."));
   }

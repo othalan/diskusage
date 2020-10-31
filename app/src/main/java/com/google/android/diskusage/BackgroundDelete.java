@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -33,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class BackgroundDelete extends Thread {
+
   ProgressDialog dialog;
   File file;
   String path;
@@ -85,9 +83,9 @@ public class BackgroundDelete extends Thread {
     dialog.setMessage(format(R.string.deleting_path, path));
     dialog.setIndeterminate(true);
     dialog.setButton(diskUsage.getString(R.string.button_background),
-            (dialog, which) -> background());
+        (dialog, which) -> background());
     dialog.setButton2(diskUsage.getString(R.string.button_cancel),
-            (dialog, which) -> cancel());
+        (dialog, which) -> cancel());
     dialog.setOnDismissListener(x -> dialog = null);
     dialog.setOnCancelListener(x -> dialog = null);
     dialog.show();
@@ -133,14 +131,14 @@ public class BackgroundDelete extends Thread {
     long displayBlockSize = diskUsage.fileSystemState.masterRoot.getDisplayBlockSize();
     try {
       FileSystemEntry newEntry = new Scanner(
-              // FIXME: hacked allocatedBlocks and heap size
-              20, displayBlockSize, 0, 4).scan(
-              DataSource.get().createLegacyScanFile(mountPoint.getRoot() + "/" + path));
+          // FIXME: hacked allocatedBlocks and heap size
+          20, displayBlockSize, 0, 4).scan(
+          DataSource.get().createLegacyScanFile(mountPoint.getRoot() + "/" + path));
       // FIXME: may be problems in case of two deletions
       entry.parent.insert(newEntry, displayBlockSize);
       diskUsage.fileSystemState.restore();
       Log.d("DiskUsage", "restoring undeleted: "
-              + newEntry.name + " " + newEntry.sizeString());
+          + newEntry.name + " " + newEntry.sizeString());
     } catch (IOException e) {
       Log.d("diskusage", "Failed to restore");
     }
@@ -155,45 +153,53 @@ public class BackgroundDelete extends Thread {
       Toast.makeText(diskUsage,
           format(R.string.deleted_n_directories_and_n_files,
               numDeletedDirectories, numDeletedFiles),
-              Toast.LENGTH_LONG).show();
+          Toast.LENGTH_LONG).show();
     } else if (deletionStatus == DELETION_CANCELED) {
       Toast.makeText(diskUsage,
           format(R.string.deleted_n_directories_and_files_and_canceled,
               numDeletedDirectories, numDeletedFiles),
-              Toast.LENGTH_LONG).show();
+          Toast.LENGTH_LONG).show();
     } else {
       Toast.makeText(diskUsage,
           format(R.string.deleted_n_directories_and_n_files_and_failed,
               numDeletedDirectories, numDeletedFiles),
-              Toast.LENGTH_LONG).show();
+          Toast.LENGTH_LONG).show();
     }
 
   }
 
-  public void background() { }
+  public void background() {
+  }
 
   public void cancel() {
     cancelDeletion = true;
   }
 
   public final int deleteRecursively(File directory) {
-    if (cancelDeletion) return DELETION_CANCELED;
+    if (cancelDeletion) {
+      return DELETION_CANCELED;
+    }
     boolean isDirectory = directory.isDirectory();
     if (isDirectory) {
       final File[] files = directory.listFiles();
-      if (files == null) return DELETION_FAILED;
+      if (files == null) {
+        return DELETION_FAILED;
+      }
       for (File value : files) {
         int status = deleteRecursively(value);
-        if (status != DELETION_SUCCESS) return status;
+        if (status != DELETION_SUCCESS) {
+          return status;
+        }
       }
     }
 
     boolean success = directory.delete();
     if (success) {
-      if (isDirectory)
+      if (isDirectory) {
         numDeletedDirectories++;
-      else
+      } else {
         numDeletedFiles++;
+      }
       return DELETION_SUCCESS;
     } else {
       return DELETION_FAILED;
@@ -203,6 +209,7 @@ public class BackgroundDelete extends Thread {
   private String format(int id, Object... args) {
     return diskUsage.getString(id, args);
   }
+
   private String str(int id) {
     return diskUsage.getString(id);
   }

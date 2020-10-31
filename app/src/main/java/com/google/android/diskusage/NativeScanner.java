@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -35,6 +32,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class NativeScanner implements ProgressGenerator {
+
   private final long blockSize;
   private final long blockSizeIn512Bytes;
   private final long sizeThreshold;
@@ -53,11 +51,13 @@ public class NativeScanner implements ProgressGenerator {
   public FileSystemEntry lastCreatedFile() {
     return lastCreatedFile;
   }
+
   public long pos() {
     return pos;
   }
 
   private class SmallList implements Comparable<SmallList> {
+
     FileSystemEntry parent;
     FileSystemEntry[] children;
     int heapSize;
@@ -86,7 +86,9 @@ public class NativeScanner implements ProgressGenerator {
 
   private void move() {
 //    Log.d("diskusage", "MOVE!");
-    if (offset == 0) throw new RuntimeException("Error: too large entity size");
+    if (offset == 0) {
+      throw new RuntimeException("Error: too large entity size");
+    }
     System.arraycopy(buffer, offset, buffer, 0, allocated - offset);
     allocated -= offset;
     offset = 0;
@@ -117,7 +119,9 @@ public class NativeScanner implements ProgressGenerator {
     long res = 0;
     byte b;
     while ((b = getByte()) != 0) {
-      if (b < '0' || b > '9') throw new RuntimeException("Error: number format error");
+      if (b < '0' || b > '9') {
+        throw new RuntimeException("Error: number format error");
+      }
       res = res * 10 + (b - '0');
     }
 //    Log.d("diskusage", "long = " + res);
@@ -127,7 +131,6 @@ public class NativeScanner implements ProgressGenerator {
   public String getString() throws IOException {
     byte[] buffer = this.buffer;
     int startPos = offset;
-
 
     while (true) {
       for (int i = startPos; i < allocated; i++) {
@@ -154,10 +157,14 @@ public class NativeScanner implements ProgressGenerator {
     int c = getByte();
 //    Log.d("diskusage", "type = " + (char)c);
     switch (c) {
-    case 'D': return Type.DIR;
-    case 'F': return Type.FILE;
-    case 'Z': return Type.NONE;
-    default: throw new RuntimeException("Error: incorrect entity type");
+      case 'D':
+        return Type.DIR;
+      case 'F':
+        return Type.FILE;
+      case 'Z':
+        return Type.NONE;
+      default:
+        throw new RuntimeException("Error: incorrect entity type");
     }
   }
 
@@ -171,25 +178,31 @@ public class NativeScanner implements ProgressGenerator {
 //    this.blockAllowance = (maxHeap / 2) * sizeThreshold;
     Log.d("diskusage", "allocatedBlocks " + allocatedBlocks);
     Log.d("diskusage", "maxHeap " + maxHeap);
-    Log.d("diskusage", "sizeThreshold = " + sizeThreshold / (float) (1 << FileSystemEntry.blockOffset));
+    Log.d("diskusage",
+        "sizeThreshold = " + sizeThreshold / (float) (1 << FileSystemEntry.blockOffset));
   }
 
   private void print(String msg, SmallList list) {
     StringBuilder hidden_path = new StringBuilder();
     // FIXME: this is debug
-    for(FileSystemEntry p = list.parent; p != null; p = p.parent) {
+    for (FileSystemEntry p = list.parent; p != null; p = p.parent) {
       hidden_path.insert(0, p.name + "/");
     }
-    Log.d("diskusage", msg + " " + hidden_path + " = " + list.heapSize + " " + list.spaceEfficiency);
+    Log.d("diskusage",
+        msg + " " + hidden_path + " = " + list.heapSize + " " + list.spaceEfficiency);
   }
 
   FileSystemEntry scan(MountPoint mountPoint) throws IOException, InterruptedException {
     is = DataSource.get().createNativeScanner(
         context, mountPoint.getRoot(), mountPoint.isRootRequired());
-    while (getByte() != 0);
+    while (getByte() != 0) {
+      ;
+    }
 
     Type type = getType();
-    if (type != Type.DIR) throw new RuntimeException("Error: no mount point");
+    if (type != Type.DIR) {
+      throw new RuntimeException("Error: no mount point");
+    }
     scanDirectory(null, getString(), 0);
     Log.d("diskusage", "allocated " + createdNodeSize + " B of heap");
 
@@ -202,11 +215,11 @@ public class NativeScanner implements ProgressGenerator {
       FileSystemEntry[] oldChildren = list.parent.children;
       FileSystemEntry[] addChildren = list.children;
       FileSystemEntry[] newChildren =
-        new FileSystemEntry[oldChildren.length - 1 + addChildren.length];
+          new FileSystemEntry[oldChildren.length - 1 + addChildren.length];
       System.arraycopy(addChildren, 0, newChildren, 0, addChildren.length);
-      for(int pos = addChildren.length, i = 0; i < oldChildren.length; i++) {
+      for (int pos = addChildren.length, i = 0; i < oldChildren.length; i++) {
         FileSystemEntry c = oldChildren[i];
-        if (! (c instanceof FileSystemEntrySmall)) {
+        if (!(c instanceof FileSystemEntrySmall)) {
           newChildren[pos++] = c;
         }
       }
@@ -216,18 +229,22 @@ public class NativeScanner implements ProgressGenerator {
     }
     Log.d("diskusage", "allocated " + extraHeap + " B of extra heap");
     Log.d("diskusage", "allocated " + (extraHeap + createdNodeSize) + " B total");
-    if (offset != allocated) throw new RuntimeException("Error: extra data, " + (allocated - offset) + " bytes");
+    if (offset != allocated) {
+      throw new RuntimeException("Error: extra data, " + (allocated - offset) + " bytes");
+    }
     is.close();
     return createdNode;
   }
 
 
   private static class SoftStack {
+
     private enum State {
       PRE_LOOP,
       LOOP,
       POST_LOOP
     }
+
     State state;
 
     FileSystemEntry parent;
@@ -264,139 +281,147 @@ public class NativeScanner implements ProgressGenerator {
     s.depth = depth_;
     s.state = SoftStack.State.PRE_LOOP;
 
-    restart: while(true) {
+    restart:
+    while (true) {
       switch (s.state) {
-      case PRE_LOOP:
-        s.dirBlockSize = getLong() / blockSizeIn512Bytes;
-        /*long dirBytesSize =*/ getLong();  // side-effects
-        makeNode(s.parent, s.name);
-        createdNodeNumDirs = 1;
-        createdNodeNumFiles = 0;
+        case PRE_LOOP:
+          s.dirBlockSize = getLong() / blockSizeIn512Bytes;
+          /*long dirBytesSize =*/
+          getLong();  // side-effects
+          makeNode(s.parent, s.name);
+          createdNodeNumDirs = 1;
+          createdNodeNumFiles = 0;
 
-        s.thisNode = createdNode;
-        lastCreatedFile = createdNode;
-        s.thisNodeSize = createdNodeSize;
-        s.thisNodeNumDirs = 1;
-        s.thisNodeNumFiles = 0;
+          s.thisNode = createdNode;
+          lastCreatedFile = createdNode;
+          s.thisNodeSize = createdNodeSize;
+          s.thisNodeNumDirs = 1;
+          s.thisNodeNumFiles = 0;
 
-        s.thisNodeSizeSmall = 0;
-        s.thisNodeNumFilesSmall = 0;
-        s.thisNodeNumDirsSmall = 0;
-        s.smallBlocks = 0;
+          s.thisNodeSizeSmall = 0;
+          s.thisNodeNumFilesSmall = 0;
+          s.thisNodeNumDirsSmall = 0;
+          s.smallBlocks = 0;
 
-        s.children = new ArrayList<>();
-        s.smallChildren = new ArrayList<>();
+          s.children = new ArrayList<>();
+          s.smallChildren = new ArrayList<>();
 
-        s.blocks = 0;
+          s.blocks = 0;
 
-      case LOOP:
-        s.state = SoftStack.State.LOOP;
-        while (true) {
-          s.childType = getType();
-          if (s.childType == Type.NONE) break;
+        case LOOP:
+          s.state = SoftStack.State.LOOP;
+          while (true) {
+            s.childType = getType();
+            if (s.childType == Type.NONE) {
+              break;
+            }
 
-          //if (isLink(child)) continue;
-          //if (isSpecial(child)) continue;
+            //if (isLink(child)) continue;
+            //if (isSpecial(child)) continue;
 
-          s.dirs = 0;
-          s.files = 1;
-          if (s.childType == Type.FILE) {
-            makeNode(s.thisNode, getString());
-            long childBlocks = getLong() / blockSizeIn512Bytes;
-            long childBytes = getLong();
-            if (childBlocks == 0) continue;
-            createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks);
-            pos += createdNode.getSizeInBlocks();
-            lastCreatedFile = createdNode;
-            //Log.d("diskusage", createdNode.path2());
-          } else {
-            // directory
-            SoftStack new_s = new SoftStack();
-            new_s.prev = s;
-            new_s.parent = s.thisNode;
-            new_s.name = getString();
-            new_s.depth = s.depth + 1;
-            new_s.state = SoftStack.State.PRE_LOOP;
-            s = new_s;
-            continue restart;
+            s.dirs = 0;
+            s.files = 1;
+            if (s.childType == Type.FILE) {
+              makeNode(s.thisNode, getString());
+              long childBlocks = getLong() / blockSizeIn512Bytes;
+              long childBytes = getLong();
+              if (childBlocks == 0) {
+                continue;
+              }
+              createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks);
+              pos += createdNode.getSizeInBlocks();
+              lastCreatedFile = createdNode;
+              //Log.d("diskusage", createdNode.path2());
+            } else {
+              // directory
+              SoftStack new_s = new SoftStack();
+              new_s.prev = s;
+              new_s.parent = s.thisNode;
+              new_s.name = getString();
+              new_s.depth = s.depth + 1;
+              new_s.state = SoftStack.State.PRE_LOOP;
+              s = new_s;
+              continue restart;
+            }
+
+            long createdNodeBlocks = createdNode.getSizeInBlocks();
+            s.blocks += createdNodeBlocks;
+
+            if (this.createdNodeSize * sizeThreshold > createdNode.encodedSize) {
+              s.smallChildren.add(createdNode);
+              s.thisNodeSizeSmall += this.createdNodeSize;
+              s.thisNodeNumFilesSmall += s.files;
+              s.thisNodeNumDirsSmall += s.dirs;
+              s.smallBlocks += createdNodeBlocks;
+            } else {
+              s.children.add(createdNode);
+              s.thisNodeSize += this.createdNodeSize;
+              s.thisNodeNumFiles += s.files;
+              s.thisNodeNumDirs += s.dirs;
+            }
           }
+        case POST_LOOP:
+          s.state = SoftStack.State.POST_LOOP;
+          s.thisNode.setSizeInBlocks(s.blocks + s.dirBlockSize, blockSize);
 
-          long createdNodeBlocks = createdNode.getSizeInBlocks();
-          s.blocks += createdNodeBlocks;
+          s.thisNodeNumDirs += s.thisNodeNumDirsSmall;
+          s.thisNodeNumFiles += s.thisNodeNumFilesSmall;
 
-          if (this.createdNodeSize * sizeThreshold > createdNode.encodedSize) {
-            s.smallChildren.add(createdNode);
-            s.thisNodeSizeSmall += this.createdNodeSize;
-            s.thisNodeNumFilesSmall += s.files;
-            s.thisNodeNumDirsSmall += s.dirs;
-            s.smallBlocks += createdNodeBlocks;
+          FileSystemEntry smallFilesEntry = null;
+
+          if ((s.thisNodeSizeSmall + s.thisNodeSize) * sizeThreshold <= s.thisNode.encodedSize
+              || s.smallChildren.isEmpty()) {
+            s.children.addAll(s.smallChildren);
+            s.thisNodeSize += s.thisNodeSizeSmall;
           } else {
+            String msg;
+            if (s.thisNodeNumDirsSmall == 0) {
+              msg = String.format("<%d files>", s.thisNodeNumFilesSmall);
+            } else if (s.thisNodeNumFilesSmall == 0) {
+              msg = String.format("<%d dirs>", s.thisNodeNumDirsSmall);
+            } else {
+              msg = String.format("<%d dirs and %d files>",
+                  s.thisNodeNumDirsSmall, s.thisNodeNumFilesSmall);
+            }
+
+            makeNode(s.thisNode, msg);
+            // create another one with right type
+            createdNode = FileSystemEntrySmall.makeNode(s.thisNode, msg,
+                s.thisNodeNumFilesSmall + s.thisNodeNumDirsSmall);
+            createdNode.setSizeInBlocks(s.smallBlocks, blockSize);
+            smallFilesEntry = createdNode;
             s.children.add(createdNode);
-            s.thisNodeSize += this.createdNodeSize;
-            s.thisNodeNumFiles += s.files;
-            s.thisNodeNumDirs += s.dirs;
-          }
-        }
-      case POST_LOOP:
-        s.state = SoftStack.State.POST_LOOP;
-        s.thisNode.setSizeInBlocks(s.blocks + s.dirBlockSize, blockSize);
-
-        s.thisNodeNumDirs += s.thisNodeNumDirsSmall;
-        s.thisNodeNumFiles += s.thisNodeNumFilesSmall;
-
-        FileSystemEntry smallFilesEntry = null;
-
-        if ((s.thisNodeSizeSmall + s.thisNodeSize) * sizeThreshold <= s.thisNode.encodedSize
-            || s.smallChildren.isEmpty()) {
-          s.children.addAll(s.smallChildren);
-          s.thisNodeSize += s.thisNodeSizeSmall;
-        } else {
-          String msg;
-          if (s.thisNodeNumDirsSmall == 0) {
-            msg = String.format("<%d files>", s.thisNodeNumFilesSmall);
-          } else if (s.thisNodeNumFilesSmall == 0) {
-            msg = String.format("<%d dirs>", s.thisNodeNumDirsSmall);
-          } else {
-            msg = String.format("<%d dirs and %d files>",
-                s.thisNodeNumDirsSmall, s.thisNodeNumFilesSmall);
+            s.thisNodeSize += createdNodeSize;
+            SmallList list = new SmallList(
+                s.thisNode,
+                s.smallChildren.toArray(new FileSystemEntry[s.smallChildren.size()]),
+                s.thisNodeSizeSmall,
+                s.smallBlocks);
+            smallLists.add(list);
           }
 
-          makeNode(s.thisNode, msg);
-          // create another one with right type
-          createdNode = FileSystemEntrySmall.makeNode(s.thisNode, msg,
-              s.thisNodeNumFilesSmall + s.thisNodeNumDirsSmall);
-          createdNode.setSizeInBlocks(s.smallBlocks, blockSize);
-          smallFilesEntry = createdNode;
-          s.children.add(createdNode);
-          s.thisNodeSize += createdNodeSize;
-          SmallList list = new SmallList(
-              s.thisNode,
-              s.smallChildren.toArray(new FileSystemEntry[s.smallChildren.size()]),
-              s.thisNodeSizeSmall,
-              s.smallBlocks);
-          smallLists.add(list);
-        }
-
-        // Magic to sort children and keep small files last in the array.
-        if (s.children.size() != 0) {
-          long smallFilesEntrySize = 0;
-          if (smallFilesEntry != null) {
-            smallFilesEntrySize = smallFilesEntry.encodedSize;
-            smallFilesEntry.encodedSize = -1;
+          // Magic to sort children and keep small files last in the array.
+          if (s.children.size() != 0) {
+            long smallFilesEntrySize = 0;
+            if (smallFilesEntry != null) {
+              smallFilesEntrySize = smallFilesEntry.encodedSize;
+              smallFilesEntry.encodedSize = -1;
+            }
+            s.thisNode.children = s.children.toArray(new FileSystemEntry[s.children.size()]);
+            java.util.Arrays.sort(s.thisNode.children, FileSystemEntry.COMPARE);
+            if (smallFilesEntry != null) {
+              smallFilesEntry.encodedSize = smallFilesEntrySize;
+            }
           }
-          s.thisNode.children = s.children.toArray(new FileSystemEntry[s.children.size()]);
-          java.util.Arrays.sort(s.thisNode.children, FileSystemEntry.COMPARE);
-          if (smallFilesEntry != null) {
-            smallFilesEntry.encodedSize = smallFilesEntrySize;
-          }
-        }
-        createdNode = s.thisNode;
-        createdNodeSize = s.thisNodeSize;
-        createdNodeNumDirs = s.thisNodeNumDirs;
-        createdNodeNumFiles = s.thisNodeNumFiles;
+          createdNode = s.thisNode;
+          createdNodeSize = s.thisNodeSize;
+          createdNodeNumDirs = s.thisNodeNumDirs;
+          createdNodeNumFiles = s.thisNodeNumFiles;
       }
       s = s.prev;
-      if (s == null) return;
+      if (s == null) {
+        return;
+      }
       s.dirs = createdNodeNumDirs;
       s.files = createdNodeNumFiles;
       // Finish missed part of inner loop
@@ -429,13 +454,14 @@ public class NativeScanner implements ProgressGenerator {
    * @throws IOException no dir
    */
   private void scanDirectory(FileSystemEntry parent, String name,
-                             int depth) throws IOException {
+      int depth) throws IOException {
     if (depth > 10) {
       scanDirectorySoftStack(parent, name, depth);
       return;
     }
     long dirBlockSize = getLong() / blockSizeIn512Bytes;
-    /*long dirBytesSize =*/ getLong();
+    /*long dirBytesSize =*/
+    getLong();
     makeNode(parent, name);
     createdNodeNumDirs = 1;
     createdNodeNumFiles = 0;
@@ -453,12 +479,13 @@ public class NativeScanner implements ProgressGenerator {
     ArrayList<FileSystemEntry> children = new ArrayList<>();
     ArrayList<FileSystemEntry> smallChildren = new ArrayList<>();
 
-
     long blocks = 0;
 
     while (true) {
       Type childType = getType();
-      if (childType == Type.NONE) break;
+      if (childType == Type.NONE) {
+        break;
+      }
 
 //      if (isLink(child)) continue;
 //      if (isSpecial(child)) continue;
@@ -468,7 +495,9 @@ public class NativeScanner implements ProgressGenerator {
         makeNode(thisNode, getString());
         long childBlocks = getLong() / blockSizeIn512Bytes;
         long childBytes = getLong();
-        if (childBlocks == 0) continue;
+        if (childBlocks == 0) {
+          continue;
+        }
         createdNode.initSizeInBytesAndBlocks(childBytes, childBlocks);
         pos += createdNode.getSizeInBlocks();
         lastCreatedFile = createdNode;
@@ -567,12 +596,12 @@ public class NativeScanner implements ProgressGenerator {
 
     createdNode = FileSystemFile.makeNode(parent, name);
     createdNodeSize =
-      4 /* ref in FileSystemEntry[] */
-      + 16 /* FileSystemEntry */
+        4 /* ref in FileSystemEntry[] */
+            + 16 /* FileSystemEntry */
 //      + 10000 /* dummy in FileSystemEntry */
-      + 8 + 10 /* aproximation of size string */
-      + 8    /* name header */
-      + name.length() * 2; /* name length */
+            + 8 + 10 /* aproximation of size string */
+            + 8    /* name header */
+            + name.length() * 2; /* name length */
     heapSize += createdNodeSize;
     while (heapSize > maxHeapSize && !smallLists.isEmpty()) {
       SmallList removed = smallLists.remove();

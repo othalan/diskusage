@@ -4,6 +4,7 @@ import com.google.android.diskusage.datasource.StatFsSource;
 import com.google.android.diskusage.proto.StatFsProto;
 
 public class StatFsSourceProtoImpl implements StatFsSource {
+
   private final StatFsProto proto;
 
   StatFsSourceProtoImpl(StatFsProto proto) {

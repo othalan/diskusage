@@ -7,6 +7,7 @@ import com.google.android.diskusage.datasource.PkgInfo;
 import com.google.android.diskusage.proto.AppInfoProto;
 
 public class AppInfoProtoImpl implements AppInfo, PkgInfo {
+
   private static final String NULL = "##NULL##";
   final AppInfoProto proto;
   private final int androidVersion;

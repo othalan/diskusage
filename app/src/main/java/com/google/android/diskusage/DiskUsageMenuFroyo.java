@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 
 public class DiskUsageMenuFroyo extends DiskUsageMenuPreCupcake {
+
   public DiskUsageMenuFroyo(DiskUsage diskusage) {
     super(diskusage);
   }
@@ -11,7 +12,7 @@ public class DiskUsageMenuFroyo extends DiskUsageMenuPreCupcake {
   @Override
   public void hideInputMethod() {
     InputMethodManager imm = (InputMethodManager)
-    diskusage.getSystemService(Context.INPUT_METHOD_SERVICE);
+        diskusage.getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(searchBox.getWindowToken(), 0);
   }
 }

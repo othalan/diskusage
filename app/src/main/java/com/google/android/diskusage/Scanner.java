@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -34,6 +31,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class Scanner implements DiskUsage.ProgressGenerator {
+
   private final long maxdepth;
   private final long blockSize;
   private final long blockSizeIn512Bytes;
@@ -51,11 +49,13 @@ public class Scanner implements DiskUsage.ProgressGenerator {
   public FileSystemEntry lastCreatedFile() {
     return lastCreatedFile;
   }
+
   public long pos() {
     return pos;
   }
 
   private static class SmallList implements Comparable<SmallList> {
+
     FileSystemEntry parent;
     FileSystemEntry[] children;
     int heapSize;
@@ -84,7 +84,8 @@ public class Scanner implements DiskUsage.ProgressGenerator {
 //    this.blockAllowance = (maxHeap / 2) * sizeThreshold;
     Log.d("diskusage", "allocatedBlocks " + allocatedBlocks);
     Log.d("diskusage", "maxHeap " + maxHeap);
-    Log.d("diskusage", "sizeThreshold = " + sizeThreshold / (float) (1 << FileSystemEntry.blockOffset));
+    Log.d("diskusage",
+        "sizeThreshold = " + sizeThreshold / (float) (1 << FileSystemEntry.blockOffset));
   }
 
   public FileSystemEntry scan(LegacyFile file) throws IOException {
@@ -105,11 +106,11 @@ public class Scanner implements DiskUsage.ProgressGenerator {
       FileSystemEntry[] oldChildren = list.parent.children;
       FileSystemEntry[] addChildren = list.children;
       FileSystemEntry[] newChildren =
-        new FileSystemEntry[oldChildren.length - 1 + addChildren.length];
+          new FileSystemEntry[oldChildren.length - 1 + addChildren.length];
       System.arraycopy(addChildren, 0, newChildren, 0, addChildren.length);
-      for(int pos = addChildren.length, i = 0; i < oldChildren.length; i++) {
+      for (int pos = addChildren.length, i = 0; i < oldChildren.length; i++) {
         FileSystemEntry c = oldChildren[i];
-        if (! (c instanceof FileSystemEntrySmall)) {
+        if (!(c instanceof FileSystemEntrySmall)) {
           newChildren[pos++] = c;
         }
       }
@@ -151,7 +152,9 @@ public class Scanner implements DiskUsage.ProgressGenerator {
       Log.d("diskusage", "list files", io);
     }
 
-    if (listNames == null) return;
+    if (listNames == null) {
+      return;
+    }
     FileSystemEntry thisNode = createdNode;
     int thisNodeSize = createdNodeSize;
 
@@ -162,7 +165,6 @@ public class Scanner implements DiskUsage.ProgressGenerator {
 
     ArrayList<FileSystemEntry> children = new ArrayList<>();
     ArrayList<FileSystemEntry> smallChildren = new ArrayList<>();
-
 
     long blocks = self_blocks;
 
@@ -245,10 +247,10 @@ public class Scanner implements DiskUsage.ProgressGenerator {
       children.add(createdNode);
       thisNodeSize += createdNodeSize;
       SmallList list = new SmallList(
-              thisNode,
-              smallChildren.toArray(new FileSystemEntry[smallChildren.size()]),
-              thisNodeSizeSmall,
-              smallBlocks);
+          thisNode,
+          smallChildren.toArray(new FileSystemEntry[smallChildren.size()]),
+          thisNodeSizeSmall,
+          smallBlocks);
       smallLists.add(list);
     }
 
@@ -272,12 +274,12 @@ public class Scanner implements DiskUsage.ProgressGenerator {
   private void makeNode(FileSystemEntry parent, String name) {
     createdNode = FileSystemFile.makeNode(parent, name);
     createdNodeSize =
-      4 /* ref in FileSystemEntry[] */
-      + 16 /* FileSystemEntry */
+        4 /* ref in FileSystemEntry[] */
+            + 16 /* FileSystemEntry */
 //      + 10000 /* dummy in FileSystemEntry */
-      + 8 + 10 /* approximation of size string */
-      + 8    /* name header */
-      + name.length() * 2; /* name length */
+            + 8 + 10 /* approximation of size string */
+            + 8    /* name header */
+            + name.length() * 2; /* name length */
     heapSize += createdNodeSize;
     while (heapSize > maxHeapSize && !smallLists.isEmpty()) {
       SmallList removed = smallLists.remove();
@@ -292,13 +294,15 @@ public class Scanner implements DiskUsage.ProgressGenerator {
    * @return size of entry in blocks
    */
   private long calculateSize(LegacyFile file) {
-    if (file.isLink()) return 0;
+    if (file.isLink()) {
+      return 0;
+    }
 
     if (file.isFile()) {
       try {
         StructStat res = Os.stat(file.getCannonicalPath());
         return res.st_blocks;
-      } catch (ErrnoException|IOException e) {
+      } catch (ErrnoException | IOException e) {
         return 0;
       }
     }
@@ -309,10 +313,14 @@ public class Scanner implements DiskUsage.ProgressGenerator {
     } catch (SecurityException io) {
       Log.e("diskusage", "list files", io);
     }
-    if (list == null) return 0;
+    if (list == null) {
+      return 0;
+    }
     long size = 1;
 
-    for (LegacyFile legacyFile : list) size += calculateSize(legacyFile);
+    for (LegacyFile legacyFile : list) {
+      size += calculateSize(legacyFile);
+    }
     return size;
   }
 }

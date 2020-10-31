@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -53,7 +50,7 @@ public class RootMountPoint extends MountPoint {
 
   @Override
   public String getKey() {
-      return "rooted:" + getRoot();
+    return "rooted:" + getRoot();
   }
 
   private static List<MountPoint> rootedMountPoints = new ArrayList<>();
@@ -73,7 +70,9 @@ public class RootMountPoint extends MountPoint {
   }
 
   public static void initMountPoints(Context context) {
-    if (init) return;
+    if (init) {
+      return;
+    }
     init = true;
 
     try {
@@ -84,7 +83,9 @@ public class RootMountPoint extends MountPoint {
         checksum += line.length();
         Log.d("diskusage", "line: " + line);
         String[] parts = line.split(" +");
-        if (parts.length < 3) continue;
+        if (parts.length < 3) {
+          continue;
+        }
         String mountPoint = parts[1];
         Log.d("diskusage", "Mount point: " + mountPoint);
         String fsType = parts[2];

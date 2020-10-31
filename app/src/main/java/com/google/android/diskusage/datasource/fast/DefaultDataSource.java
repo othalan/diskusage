@@ -72,7 +72,7 @@ public class DefaultDataSource extends DataSource {
   @Override
   public InputStream createNativeScanner(
       Context context, String path, boolean rootRequired)
-          throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
     return new NativeScannerStream.Factory(context).create(path, rootRequired);
   }
 

@@ -7,6 +7,7 @@ public final class StatFsProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile StatFsProto[] _emptyArray;
+
   public static StatFsProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -164,7 +165,7 @@ public final class StatFsProto extends
 
   @Override
   public StatFsProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -231,7 +232,7 @@ public final class StatFsProto extends
   }
 
   public static StatFsProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new StatFsProto().mergeFrom(input);
   }

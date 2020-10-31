@@ -8,6 +8,7 @@ import com.google.android.diskusage.proto.BooleanValueProto;
 import com.google.android.diskusage.proto.PortableFileProto;
 
 public class PortableFileProtoImpl implements PortableFile {
+
   final PortableFileProto proto;
   private final int androidVersion;
 

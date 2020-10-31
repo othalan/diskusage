@@ -7,6 +7,7 @@ public final class PortableResultProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile PortableResultProto[] _emptyArray;
+
   public static PortableResultProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -54,7 +55,7 @@ public final class PortableResultProto extends
     int size = super.computeSerializedSize();
     if (this.exception != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(1, this.exception);
+          .computeMessageSize(1, this.exception);
     }
     if (this.evaluated) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
@@ -65,7 +66,7 @@ public final class PortableResultProto extends
 
   @Override
   public PortableResultProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -99,7 +100,7 @@ public final class PortableResultProto extends
   }
 
   public static PortableResultProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new PortableResultProto().mergeFrom(input);
   }

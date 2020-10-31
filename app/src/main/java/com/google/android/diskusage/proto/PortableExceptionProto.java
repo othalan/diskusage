@@ -7,6 +7,7 @@ public final class PortableExceptionProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile PortableExceptionProto[] _emptyArray;
+
   public static PortableExceptionProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -76,7 +77,7 @@ public final class PortableExceptionProto extends
 
   @Override
   public PortableExceptionProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -111,7 +112,7 @@ public final class PortableExceptionProto extends
   }
 
   public static PortableExceptionProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new PortableExceptionProto().mergeFrom(input);
   }

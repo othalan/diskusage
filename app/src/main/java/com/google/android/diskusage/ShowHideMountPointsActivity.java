@@ -16,24 +16,25 @@ import java.util.Map;
 import java.util.Set;
 
 public class ShowHideMountPointsActivity extends PreferenceActivity {
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.mount_points_ignore_list);
     getPreferenceScreen().setOrderingAsAdded(true);
   }
-  
+
   @Override
   protected void onResume() {
     super.onResume();
     List<MountPoint> mountPoints = RootMountPoint.getRootedMountPoints(this);
     PreferenceScreen prefs = getPreferenceScreen();
     prefs.removeAll();
-    SharedPreferences shprefs =  getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
+    SharedPreferences shprefs = getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
     Map<String, ?> ignoreList = shprefs.getAll();
     Set<String> ignores = ignoreList.keySet();
 
-    for (MountPoint mountPoint: mountPoints) {
+    for (MountPoint mountPoint : mountPoints) {
       CheckBoxPreference pref = new CheckBoxPreference(this);
       FileSystemEntry.setupStrings(this);
       FileSystemStats stats = new FileSystemStats(mountPoint);
@@ -43,12 +44,12 @@ public class ShowHideMountPointsActivity extends PreferenceActivity {
       prefs.addPreference(pref);
     }
   }
-  
+
   @Override
   protected void onPause() {
     super.onPause();
     PreferenceScreen prefs = getPreferenceScreen();
-    SharedPreferences shprefs =  getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
+    SharedPreferences shprefs = getSharedPreferences("ignore_list", Context.MODE_PRIVATE);
     Editor editor = shprefs.edit();
     editor.clear();
 

@@ -1,20 +1,17 @@
 /**
- * DiskUsage - displays sdcard usage on android.
- * Copyright (C) 2008-2011 Ivan Volosyuk
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * DiskUsage - displays sdcard usage on android. Copyright (C) 2008-2011 Ivan Volosyuk
+ * <p>
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  */
 
 package com.google.android.diskusage;
@@ -37,6 +34,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 public class MyProgressDialog extends AlertDialog {
+
   private final Context context;
   private TextView percentView;
   private TextView detailsView;
@@ -55,6 +53,7 @@ public class MyProgressDialog extends AlertDialog {
   public void setMax(long max) {
     this.max = max;
   }
+
   private int depth = 0;
   private boolean warned = false;
 
@@ -67,7 +66,9 @@ public class MyProgressDialog extends AlertDialog {
     }
 
     depth = pathElements.size();
-    if (pathElements.size() < 2) return "";
+    if (pathElements.size() < 2) {
+      return "";
+    }
     pathElements.remove(pathElements.size() - 1);
     StringBuilder path = new StringBuilder();
     String sep = "";
@@ -91,14 +92,18 @@ public class MyProgressDialog extends AlertDialog {
     Paint textPaint = detailsView.getPaint();
 
     for (diff = 0; diff < len; diff++) {
-      if (pathChars[diff] == prevPathChars[diff]) continue;
+      if (pathChars[diff] == prevPathChars[diff]) {
+        continue;
+      }
       break;
     }
 
     float winWidth = detailsView.getWidth();
     float extraTextWidth = textPaint.measureText("/.../G");
     float width = winWidth - extraTextWidth;
-    if (width < extraTextWidth) return path;
+    if (width < extraTextWidth) {
+      return path;
+    }
 
     int firstSep = -2;
     int lastSep = -2;
@@ -112,7 +117,9 @@ public class MyProgressDialog extends AlertDialog {
       lastSep = path.lastIndexOf('/', diff);
       firstSep = path.indexOf("/");
 
-      if (lastSep == -1 || firstSep == -1) return path;
+      if (lastSep == -1 || firstSep == -1) {
+        return path;
+      }
 
       float firstPart = textPaint.measureText(path, 0, firstSep);
       float lastPart = textPaint.measureText(path, lastSep, diff);
@@ -166,7 +173,7 @@ public class MyProgressDialog extends AlertDialog {
     } catch (RuntimeException e) {
       throw new RuntimeException(
           "path = " + path + "[" + firstSep + ":" + lastSep + "]" +
-          " win =" + winWidth + " extra=" + extraTextWidth + " diff=" + diff,
+              " win =" + winWidth + " extra=" + extraTextWidth + " diff=" + diff,
           e);
     }
   }
@@ -176,7 +183,7 @@ public class MyProgressDialog extends AlertDialog {
     long progress = MyProgressDialog.this.progress;
     long max = MyProgressDialog.this.max;
     double percent = (double) progress / (double) max * basePercent + (1 - basePercent);
-    progressBar.setProgress((int)(percent * 10000));
+    progressBar.setProgress((int) (percent * 10000));
     detailsView.setText(details);  // progressNumber.setText(String.format(format, progress, max));
     SpannableString tmp = new SpannableString(progressPercentFormat.format(percent));
     tmp.setSpan(new StyleSpan(android.graphics.Typeface.BOLD),

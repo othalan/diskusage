@@ -12,6 +12,7 @@ import com.google.android.diskusage.entity.FileSystemSpecial;
 import com.google.android.diskusage.entity.FileSystemSuperRoot;
 
 public abstract class DiskUsageMenu {
+
   protected final DiskUsage diskusage;
   protected String searchPattern;
   private FileSystemEntry selectedEntity;
@@ -41,8 +42,11 @@ public abstract class DiskUsageMenu {
   }
 
   public abstract void onCreate();
+
   public abstract boolean readyToFinish();
+
   public abstract void searchRequest();
+
   public abstract MenuItem makeSearchMenuEntry(Menu menu);
 
   public final void onSaveInstanceState(Bundle outState) {
@@ -59,7 +63,9 @@ public abstract class DiskUsageMenu {
   }
 
   public void applyPattern(String searchQuery) {
-    if (searchQuery == null || masterRoot == null) return;
+    if (searchQuery == null || masterRoot == null) {
+      return;
+    }
 
     if (searchQuery.length() == 0) {
       searchManager.cancelSearch();
@@ -71,7 +77,9 @@ public abstract class DiskUsageMenu {
 
   public boolean finishedSearch(FileSystemSuperRoot newRoot, String searchQuery) {
     boolean matched = newRoot != null;
-    if (!matched) newRoot = masterRoot;
+    if (!matched) {
+      newRoot = masterRoot;
+    }
     diskusage.applyPatternNewRoot(newRoot);
     return matched;
   }
@@ -120,7 +128,9 @@ public abstract class DiskUsageMenu {
   }
 
   private void updateMenu() {
-    if (showMenuItem == null) return;
+    if (showMenuItem == null) {
+      return;
+    }
 
     if (diskusage.fileSystemState == null) {
       searchMenuItem.setEnabled(false);
@@ -146,9 +156,8 @@ public abstract class DiskUsageMenu {
     rescanMenuItem.setEnabled(true);
     searchMenuItem.setEnabled(true);
 
-
     boolean view = !(selectedEntity == diskusage.fileSystemState.masterRoot.children[0]
-                || selectedEntity instanceof FileSystemSpecial);
+        || selectedEntity instanceof FileSystemSpecial);
     showMenuItem.setEnabled(view);
 
     boolean fileOrNotSearching = searchPattern == null || selectedEntity.children == null;

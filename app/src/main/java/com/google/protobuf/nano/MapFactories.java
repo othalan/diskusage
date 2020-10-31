@@ -37,7 +37,9 @@ import java.util.Map;
  * Utility class for maps support.
  */
 public final class MapFactories {
+
   public interface MapFactory {
+
     <K, V> Map<K, V> forMap(Map<K, V> oldMap);
   }
 
@@ -45,7 +47,8 @@ public final class MapFactories {
   // The way to provide customized implementations of maps for different
   // platforms are still under discussion.  Mark it as private to avoid exposing
   // the API in proto3 alpha release.
-  /* public */ static void setMapFactory(MapFactory newMapFactory) {
+  /* public */
+  static void setMapFactory(MapFactory newMapFactory) {
     mapFactory = newMapFactory;
   }
 
@@ -54,6 +57,7 @@ public final class MapFactories {
   }
 
   private static class DefaultMapFactory implements MapFactory {
+
     public <K, V> Map<K, V> forMap(Map<K, V> oldMap) {
       if (oldMap == null) {
         return new HashMap<K, V>();
@@ -61,7 +65,9 @@ public final class MapFactories {
       return oldMap;
     }
   }
+
   private static volatile MapFactory mapFactory = new DefaultMapFactory();
 
-  private MapFactories() {}
+  private MapFactories() {
+  }
 }

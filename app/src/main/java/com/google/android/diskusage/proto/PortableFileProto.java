@@ -7,6 +7,7 @@ public final class PortableFileProto extends
     com.google.protobuf.nano.MessageNano {
 
   private static volatile PortableFileProto[] _emptyArray;
+
   public static PortableFileProto[] emptyArray() {
     // Lazily initializes the empty array
     if (_emptyArray == null) {
@@ -90,11 +91,11 @@ public final class PortableFileProto extends
     }
     if (this.isExternalStorageEmulated != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(3, this.isExternalStorageEmulated);
+          .computeMessageSize(3, this.isExternalStorageEmulated);
     }
     if (this.isExternalStorageRemovable != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(4, this.isExternalStorageRemovable);
+          .computeMessageSize(4, this.isExternalStorageRemovable);
     }
     if (this.totalSpace != 0L) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
@@ -102,14 +103,14 @@ public final class PortableFileProto extends
     }
     if (this.parent != null) {
       size += com.google.protobuf.nano.CodedOutputByteBufferNano
-        .computeMessageSize(6, this.parent);
+          .computeMessageSize(6, this.parent);
     }
     return size;
   }
 
   @Override
   public PortableFileProto mergeFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     while (true) {
       int tag = input.readTag();
@@ -165,7 +166,7 @@ public final class PortableFileProto extends
   }
 
   public static PortableFileProto parseFrom(
-          com.google.protobuf.nano.CodedInputByteBufferNano input)
+      com.google.protobuf.nano.CodedInputByteBufferNano input)
       throws java.io.IOException {
     return new PortableFileProto().mergeFrom(input);
   }
